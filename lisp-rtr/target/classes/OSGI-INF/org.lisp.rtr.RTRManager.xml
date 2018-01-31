@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.lisp.rtr.RTRManager" activate="activate" deactivate="deactivate">
+    <implementation class="org.lisp.rtr.RTRManager"/>
+    <property name="service.pid" value="org.lisp.rtr.RTRManager"/>
+    <reference name="controller" interface="org.onosproject.lisp.ctl.LispController" cardinality="1..1" policy="static" bind="bindController" unbind="unbindController"/>
+</scr:component>
