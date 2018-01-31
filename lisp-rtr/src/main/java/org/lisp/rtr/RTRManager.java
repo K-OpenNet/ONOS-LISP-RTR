@@ -59,12 +59,12 @@ public class RTRManager {
 	
 		@Override
 		public void handleIncomingMessage(LispRouterId routerId, LispMessage msg) {
-		
+			log.info("LISP incoming msg");		
 		}
 
 		@Override
 		public void handleOutgoingMessage(LispRouterId routerId, LispMessage msg) {
-
+			log.info("LISP outgoing msg");
 		}
 
 		private void isCtrlMsg() {
