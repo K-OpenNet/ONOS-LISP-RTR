@@ -25,6 +25,10 @@ public class RecordDB {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
+	public void initialize() {
+
+	}
+
 	public void addMapping() {
 
 	}
