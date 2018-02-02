@@ -34,6 +34,7 @@ import io.netty.handler.logging.LoggingHandler;
 
 public class LispChannelManage {
 
+	private final Logger log = LoggerFactory.getLogger(getClass());
 	private final int LISP_DATA_PORT = 4341;
 
 	private ChannelFuture dataChannel;
@@ -50,7 +51,7 @@ public class LispChannelManage {
 			@Override
 			protected void initChannel(NioDatagramChannel socket) throws Exception {
 				ChannelPipeline pipe = socket.pipeline();
-		//		pipe.addList("lispdatahandler", new 
+				pipe.addLast("lispdatahandler", new LispDataPacketHandler());
 			}	
 		});
 	}
@@ -69,7 +70,8 @@ public class LispChannelManage {
 		
 		@Override
 		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-
+			log.info("LISP data comming");
+			
 		}
 
 		@Override

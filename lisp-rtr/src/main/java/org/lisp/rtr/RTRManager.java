@@ -41,11 +41,14 @@ public class RTRManager {
 
 	private final LispMsgListener messageListener =
 				new LispMsgListener();
+	private final LispChannelManage dataListener =
+				new LispChannelManage();
 
 	@Activate
 	protected void activate() {
 		
 		controller.addMessageListener(messageListener);
+		dataListener.initialize();
 
 	        log.info("Started");
 	}
