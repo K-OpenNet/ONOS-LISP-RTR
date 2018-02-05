@@ -30,6 +30,12 @@ import org.onosproject.lisp.ctl.LispMessageListener;
 import org.onosproject.lisp.ctl.LispRouterId;
 
 import org.onosproject.lisp.msg.protocols.LispMessage;
+import org.onosproject.lisp.msg.protocols.LispEncapsulatedControl;
+import org.onosproject.lisp.msg.protocols.LispMapRegister;
+import org.onosproject.lisp.msg.protocols.LispMapRecord;
+
+import org.onosproject.lisp.msg.types.LispAfiAddress;
+import static org.onosproject.lisp.msg.types.AddressFamilyIdentifierEnum.IP4;
 
 @Component(immediate = true)
 public class RTRManager {
@@ -44,11 +50,14 @@ public class RTRManager {
 	private final LispChannelManage dataListener =
 				new LispChannelManage();
 
+	private Mapcache map = new Mapcache();
+
 	@Activate
 	protected void activate() {
 		
 		controller.addMessageListener(messageListener);
 		dataListener.initialize();
+		map.initialize();
 
 	        log.info("Started");
 	}
@@ -63,6 +72,33 @@ public class RTRManager {
 		@Override
 		public void handleIncomingMessage(LispRouterId routerId, LispMessage msg) {
 			log.info("LISP incoming msg");		
+
+			// Only process ECM-mapregister
+			if ( msg instanceof LispEncapsulatedControl ) {
+				// Extract inner msg
+				LispMessage innermsg = ((LispEncapsulatedControl)(msg)).getControlMessage();
+			        innermsg.configSender(msg.getSender());
+
+				if ( innermsg instanceof LispMapRegister ) {
+					LispMapRegister reg = (LispMapRegister) innermsg;
+
+					// Create mapcache
+					for ( LispMapRecord record : reg.getMapRecords() ) {
+						LispAfiAddress addr = record.getEidPrefixAfi();
+
+						// Only support IPv4
+						if ( addr.getAfi() == IP4 ) {
+
+						}
+					}
+				}
+				else {
+					log.info("Not supported");
+				}
+			}
+			else {
+				log.info("Not supported");
+			}
 		}
 
 		@Override
