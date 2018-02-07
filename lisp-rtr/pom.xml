@@ -33,7 +33,6 @@
         <onos.app.category>default</onos.app.category>
         <onos.app.url>http://onosproject.org</onos.app.url>
         <onos.app.readme>ONOS OSGi bundle archetype.</onos.app.readme>
-	<onos.app.requires>org.onosproject.lisp.ctl</onos.app.requires>
     </properties>
 
     <dependencies>
