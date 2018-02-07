@@ -149,7 +149,7 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 								.innerLispMessage(noti)
 								.build();
 
-			log.info(map.sxTR_public_RLOC.toString());
+			log.info(enoti.toString());
 			ByteBuf byteBuf = Unpooled.buffer();
 			enoti.writeTo(byteBuf);
 			ctx.writeAndFlush(new DatagramPacket(byteBuf, map.sxTR_public_RLOC, noti.getSender()));
