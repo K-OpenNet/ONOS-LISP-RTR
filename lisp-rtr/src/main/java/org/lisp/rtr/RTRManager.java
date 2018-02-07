@@ -49,6 +49,7 @@ public class RTRManager {
 		
 		map.initialize();
 		channel.initialize(this);
+		controller.addMessageListener(new LispCtlMsgListener());
 
 	        log.info("Started");
 	}
