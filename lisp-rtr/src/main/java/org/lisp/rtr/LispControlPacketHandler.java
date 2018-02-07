@@ -142,6 +142,7 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 			iph.setDestinationAddress(t);
 			EcmBuilder builder = new DefaultEcmBuilder();
 			log.info(iph.toString());
+			log.info(noti.toString());
 			LispEncapsulatedControl enoti = builder.isSecurity(false)
 								.innerIpHeader((IP)iph)
 								.innerUdpHeader(map.udh)
