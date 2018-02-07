@@ -81,6 +81,10 @@ public class Mapcache {
 		return null;
 	}
 
+	public int getSize() {
+		return this.mapDb.size();
+	}
+
 	public class MapcacheEntry {
 
 		byte eidLen;

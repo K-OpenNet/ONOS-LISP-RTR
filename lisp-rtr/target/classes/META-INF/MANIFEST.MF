@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1517858469252
+Bnd-LastModified: 1517988135098
 Build-Jdk: 1.8.0_144
 Built-By: juk909090
 Bundle-Blueprint: OSGI-INF/blueprint/shell-config.xml
@@ -9,16 +9,20 @@ Bundle-Name: lisp-rtr
 Bundle-SymbolicName: org.lisp.rtr
 Bundle-Version: 1.0.0.SNAPSHOT
 Created-By: Apache Maven Bundle Plugin
-Export-Package: org.lisp.rtr;uses:="org.onosproject.lisp.ctl";version="1
- .0.0",org.lisp.rtr.cli;uses:="org.apache.karaf.shell.commands,org.onosp
- roject.cli";version="1.0.0"
-Import-Package: io.netty.bootstrap;version="[4.1,5)",io.netty.channel;ve
- rsion="[4.1,5)",io.netty.channel.nio;version="[4.1,5)",io.netty.channel
- .socket.nio;version="[4.1,5)",org.apache.karaf.shell.commands;version="
- [3.0,4)",org.onosproject.cli;version="[1.10,2)",org.onosproject.lisp.ct
- l;version="[1.10,2)",org.onosproject.lisp.msg.protocols;version="[1.10,
- 2)",org.onosproject.lisp.msg.types;version="[1.10,2)",org.osgi.service.
- blueprint;version="[1.0.0,2.0.0)",org.slf4j;version="[1.6,2)"
+Export-Package: org.lisp.rtr;uses:="io.netty.channel,io.netty.channel.so
+ cket,io.netty.handler.codec,org.onosproject.lisp.ctl";version="1.0.0",o
+ rg.lisp.rtr.cli;uses:="org.apache.karaf.shell.commands,org.onosproject.
+ cli";version="1.0.0"
+Import-Package: io.netty.bootstrap;version="[4.1,5)",io.netty.buffer;ver
+ sion="[4.1,5)",io.netty.channel;version="[4.1,5)",io.netty.channel.nio;
+ version="[4.1,5)",io.netty.channel.socket;version="[4.1,5)",io.netty.ch
+ annel.socket.nio;version="[4.1,5)",io.netty.handler.codec;version="[4.1
+ ,5)",org.apache.karaf.shell.commands;version="[3.0,4)",org.onlab.packet
+ ;version="[1.10,2)",org.onosproject.cli;version="[1.10,2)",org.onosproj
+ ect.lisp.ctl;version="[1.10,2)",org.onosproject.lisp.msg.protocols;vers
+ ion="[1.10,2)",org.onosproject.lisp.msg.types;version="[1.10,2)",org.os
+ gi.service.blueprint;version="[1.0.0,2.0.0)",org.slf4j;version="[1.6,2)
+ "
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 Service-Component: OSGI-INF/org.lisp.rtr.RTRManager.xml
 Tool: Bnd-3.0.0.201509101326

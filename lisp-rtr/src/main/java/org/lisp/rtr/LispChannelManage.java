@@ -36,50 +36,34 @@ public class LispChannelManage {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	private final int LISP_DATA_PORT = 4341;
+	private final int LISP_CONTROL_PORT = 4342;
 
-	private ChannelFuture dataChannel;
-	private EventLoopGroup group;
-	private Bootstrap boot;
+	private EventLoopGroup data_group;
+	private EventLoopGroup control_group;
+	private Bootstrap data_boot;
+	private Bootstrap control_boot;
 
-	public void initialize() {
-		
-		boot = new Bootstrap();
-		group = new NioEventLoopGroup();
-		boot.group(group)
-		.channel(NioDatagramChannel.class)
-		.handler(new ChannelInitializer<NioDatagramChannel>() {
-			@Override
-			protected void initChannel(NioDatagramChannel socket) throws Exception {
-				ChannelPipeline pipe = socket.pipeline();
-				pipe.addLast("lispdatahandler", new LispDataPacketHandler());
-			}	
-		});
+	public void initialize(RTRManager rtr) {
+		createBootstrap(rtr);
 	}
 
 	public void close() {
 
 	}
 
-	private void createBootstrap() {
-
+	private void createBootstrap(RTRManager rtr) {
+		control_boot = new Bootstrap();
+		control_group = new NioEventLoopGroup();
+		control_boot.group(control_group)
+		.channel(NioDatagramChannel.class)
+		.handler(new ChannelInitializer<NioDatagramChannel>() {
+			@Override
+			protected void initChannel(NioDatagramChannel socket) throws Exception {
+				ChannelPipeline pipe = socket.pipeline();
+				pipe.addLast("lisp_control_decoder", new LispControlPacketDecoder());
+				pipe.addLast("lisp_control_handler", new LispControlPacketHandler(rtr));
+			}	
+		});
 	}
-
-	private class LispDataPacketHandler extends ChannelInboundHandlerAdapter {
-
-		private final Logger log = LoggerFactory.getLogger(getClass());
-		
-		@Override
-		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-			log.info("LISP data comming");
-			
-		}
-
-		@Override
-		public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-	
-		}
-
-	}
-	
 }
 

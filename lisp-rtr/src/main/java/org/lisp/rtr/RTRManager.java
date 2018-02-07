@@ -29,13 +29,8 @@ import org.onosproject.lisp.ctl.LispController;
 import org.onosproject.lisp.ctl.LispMessageListener;
 import org.onosproject.lisp.ctl.LispRouterId;
 
-import org.onosproject.lisp.msg.protocols.LispMessage;
-import org.onosproject.lisp.msg.protocols.LispEncapsulatedControl;
-import org.onosproject.lisp.msg.protocols.LispMapRegister;
-import org.onosproject.lisp.msg.protocols.LispMapRecord;
-
-import org.onosproject.lisp.msg.types.LispAfiAddress;
-import static org.onosproject.lisp.msg.types.AddressFamilyIdentifierEnum.IP4;
+import java.net.InetSocketAddress;
+import java.net.InetAddress;
 
 @Component(immediate = true)
 public class RTRManager {
@@ -45,19 +40,14 @@ public class RTRManager {
 	@Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
 	protected LispController controller;
 
-	private final LispMsgListener messageListener =
-				new LispMsgListener();
-	private final LispChannelManage dataListener =
-				new LispChannelManage();
-
 	private Mapcache map = new Mapcache();
+	private LispChannelManage channel = new LispChannelManage();
 
 	@Activate
 	protected void activate() {
 		
-		controller.addMessageListener(messageListener);
-		dataListener.initialize();
 		map.initialize();
+		channel.initialize(this);
 
 	        log.info("Started");
 	}
@@ -67,65 +57,8 @@ public class RTRManager {
 	        log.info("Stopped");
 	}
 
-	private class LispMsgListener implements LispMessageListener {
-	
-		@Override
-		public void handleIncomingMessage(LispRouterId routerId, LispMessage msg) {
-			log.info("LISP incoming msg");		
-
-			// Only process ECM-mapregister
-			if ( msg instanceof LispEncapsulatedControl ) {
-				// Extract inner msg
-				LispMessage innermsg = ((LispEncapsulatedControl)(msg)).getControlMessage();
-			        innermsg.configSender(msg.getSender());
-
-				if ( innermsg instanceof LispMapRegister ) {
-					LispMapRegister reg = (LispMapRegister) innermsg;
-
-					// Create mapcache
-					for ( LispMapRecord record : reg.getMapRecords() ) {
-						LispAfiAddress addr = record.getEidPrefixAfi();
-
-						// Only support IPv4
-						if ( addr.getAfi() == IP4 ) {
-
-						}
-					}
-				}
-				else {
-					log.info("Not supported");
-				}
-			}
-			else {
-				log.info("Not supported");
-			}
-		}
-
-		@Override
-		public void handleOutgoingMessage(LispRouterId routerId, LispMessage msg) {
-			log.info("LISP outgoing msg");
-		}
-
-		private void isCtrlMsg() {
-			
-		}
-
-		public void forwardMapServer() {
-
-		}
-
-		public void rewriteAddress() {
-
-		}
-
-		public void addHostMapping() {
-
-		}
-
-		public void forwardHost() {
-
-		}
-	
+	public void addMapcacheMapping(InetSocketAddress grloc, byte len, InetAddress prefix, InetAddress rloc, long id1, long id2) {
+		map.addMapping(grloc, len, prefix, rloc, id1, id2);
+		log.info(Integer.toString(map.getSize()));
 	}
-
 }
