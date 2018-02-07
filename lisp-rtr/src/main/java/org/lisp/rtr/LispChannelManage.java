@@ -53,7 +53,6 @@ public class LispChannelManage {
 
 	public void initialize(RTRManager rtr) {
 		createBootstrap(rtr);
-//		controller.addMessageListener(new LispCtlMsgListener());
 	}
 
 	public void close() {
@@ -81,17 +80,5 @@ public class LispChannelManage {
 		catch(Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	private class LispCtlMsgListener implements LispMessageListener {
-
-	        @Override
-        	public void handleIncomingMessage(LispRouterId routerId, LispMessage msg) {
-			log.info("WTF??");
-	        }
-	
-	        @Override
-        	public void handleOutgoingMessage(LispRouterId routerId, LispMessage msg) {
-	        }	
 	}
 }
