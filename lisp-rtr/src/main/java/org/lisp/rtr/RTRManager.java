@@ -47,7 +47,7 @@ public class RTRManager {
 	protected void activate() {
 		
 		map.initialize();
-//		channel.initialize(this);
+		channel.initialize(this);
 
 	        log.info("Started");
 	}
