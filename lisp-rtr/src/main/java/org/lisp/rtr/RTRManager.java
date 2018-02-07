@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.onosproject.lisp.ctl.LispController;
 import org.onosproject.lisp.ctl.LispMessageListener;
 import org.onosproject.lisp.ctl.LispRouterId;
+import org.onosproject.lisp.msg.protocols.LispMessage;
 
 import java.net.InetSocketAddress;
 import java.net.InetAddress;
@@ -60,5 +61,16 @@ public class RTRManager {
 	public void addMapcacheMapping(InetSocketAddress grloc, byte len, InetAddress prefix, InetAddress rloc, long id1, long id2) {
 		map.addMapping(grloc, len, prefix, rloc, id1, id2);
 		log.info(Integer.toString(map.getSize()));
+	}
+	private class LispCtlMsgListener implements LispMessageListener {
+
+	        @Override
+        	public void handleIncomingMessage(LispRouterId routerId, LispMessage msg) {
+			log.info("WTF");
+	        }
+	
+	        @Override
+        	public void handleOutgoingMessage(LispRouterId routerId, LispMessage msg) {
+	        }	
 	}
 }

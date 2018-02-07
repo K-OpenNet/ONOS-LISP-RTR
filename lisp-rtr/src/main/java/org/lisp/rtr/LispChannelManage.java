@@ -46,9 +46,6 @@ public class LispChannelManage {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	@Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
-	protected LispController controller;
-
 	private final int LISP_DATA_PORT = 4341;
 	private final int LISP_CONTROL_PORT = 4342;
 
@@ -59,7 +56,7 @@ public class LispChannelManage {
 
 	public void initialize(RTRManager rtr) {
 //		createBootstrap(rtr);
-		controller.addMessageListener(new LispCtlMsgListener());
+//		controller.addMessageListener(new LispCtlMsgListener());
 	}
 
 	public void close() {
