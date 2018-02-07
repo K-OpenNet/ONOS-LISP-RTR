@@ -80,6 +80,7 @@
             <groupId>org.onosproject</groupId>
             <artifactId>onos-lisp-ctl</artifactId>
             <version>${onos.version}</version>
+	    <scope>provided</scope>
         </dependency>
 
         <dependency>
