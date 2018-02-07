@@ -34,6 +34,10 @@ import org.onosproject.lisp.msg.protocols.LispEncapsulatedControl;
 import org.onosproject.lisp.msg.protocols.LispMapRegister;
 import org.onosproject.lisp.msg.protocols.LispMapRecord;
 import org.onosproject.lisp.msg.protocols.LispLocator;
+import org.onosproject.lisp.msg.protocols.DefaultLispMapRegister;
+import org.onosproject.lisp.msg.protocols.DefaultLispMapRegister.DefaultRegisterBuilder;
+
+import org.onosproject.lisp.msg.authentication.LispAuthenticationConfig;
 
 import org.onlab.packet.IP;
 import org.onlab.packet.IpAddress;
@@ -49,6 +53,8 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	private RTRManager rtr;
+
+	private LispAuthenticationConfig authConfig = LispAuthenticationConfig.getInstance();
 
 	public LispControlPacketHandler(RTRManager rtr) {
 		log.info("LISP control packet handler create");
@@ -98,9 +104,18 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 						*/
 
 						//Re-originate map-register
-						ByteBuf byteBuf = Unpooled.buffer();
-					        ((LispMessage) innermsg).writeTo(byteBuf);
+						DefaultRegisterBuilder registerBuilder = new DefaultRegisterBuilder();
+					        registerBuilder.withKeyId(reg.getKeyId());
+				        	registerBuilder.withAuthKey(authConfig.lispAuthKey());
+					        registerBuilder.withNonce(reg.getNonce());
+				        	registerBuilder.withIsProxyMapReply(reg.isProxyMapReply());
+					        registerBuilder.withIsWantMapNotify(reg.isWantMapNotify());
+					        registerBuilder.withMapRecords(reg.getMapRecords());
+
+					        LispMapRegister authRegister = registerBuilder.build();
 						InetAddress msaddr = (IpAddress.valueOf(innerv4.getDestinationAddress())).toInetAddress();
+						ByteBuf byteBuf = Unpooled.buffer();
+						authRegister.writeTo(byteBuf);
 						ctx.writeAndFlush(new DatagramPacket(byteBuf, new InetSocketAddress(msaddr, 4342)));
 					}
 				}
