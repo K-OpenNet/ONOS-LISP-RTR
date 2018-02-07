@@ -17,6 +17,6 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.2.1" name="${project.artifactId}-${project.version}">
     <feature name="${project.artifactId}" version="${project.version}"
              description="${project.description}">
-	<bundle>mvn:org.onosproject/onos-lisp-ctl/${onos.version}</bundle>
+	<bundle>mvn:org.onosproject/onos-lisp-ctl/1.10.2</bundle>
     </feature>
 </features>
