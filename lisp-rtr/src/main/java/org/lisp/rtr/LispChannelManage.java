@@ -68,7 +68,7 @@ public class LispChannelManage {
 					pipe.addLast("lisp_control_handler", new LispControlPacketHandler(rtr));
 				}	
 			});
-			control_boot.bind(new InetSocketAddress(LISP_CONTROL_PORT)).sync();
+			control_boot.bind(new InetSocketAddress(LISP_CONTROL_PORT)).sync().channel().closeFuture().await();
 		}
 		catch(Exception e) {
 			e.printStackTrace();
