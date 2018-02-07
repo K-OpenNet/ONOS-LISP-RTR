@@ -37,9 +37,6 @@ import java.net.InetAddress;
 public class RTRManager {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
-	
-	@Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
-	protected LispController controller;
 
 	private Mapcache map = new Mapcache();
 	private LispChannelManage channel = new LispChannelManage();
