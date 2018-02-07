@@ -148,7 +148,7 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 			log.info(iph.toString());
 			log.info(noti.toString());
 			DefaultLispEncapsulatedControl enoti = (DefaultLispEncapsulatedControl)(builder.isSecurity(false)
-								.innerIpHeader((IP)iph)
+								.innerIpHeader(iph)
 								.innerUdpHeader(map.udh)
 								.innerLispMessage(noti)
 								.build());
@@ -157,11 +157,7 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 			ByteBuf byteBuf = Unpooled.buffer();
 			enoti.writeTo(byteBuf);
 
-        LispMessageReader reader = LispMessageReaderFactory.getReader(byteBuf);
-        LispMessage message = (LispMessage) reader.readFrom(byteBuf);
-        message.configSender(noti.getSender());
-			log.info(message.toString());
-			ctx.writeAndFlush(new DatagramPacket(byteBuf, map.sxTR_public_RLOC, noti.getSender()));
+			ctx.writeAndFlush(new DatagramPacket(byteBuf, map.sxTR_public_RLOC));
 		}
 		else {
 			log.info("Not supported");
