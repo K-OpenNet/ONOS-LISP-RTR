@@ -157,7 +157,7 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 			ByteBuf byteBuf = Unpooled.buffer();
 			enoti.writeTo(byteBuf);
 
-			ctx.writeAndFlush(new DatagramPacket(byteBuf, map.sxTR_public_RLOC));
+			ctx.writeAndFlush(new DatagramPacket(byteBuf, new InetSocketAddress(map.sxTR_public_RLOC.getAddress(), 4342), new InetSocketAddress("192.168.36.137", 4341)));
 		}
 		else {
 			log.info("Not supported");
