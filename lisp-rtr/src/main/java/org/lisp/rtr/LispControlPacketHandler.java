@@ -53,6 +53,10 @@ import static org.onosproject.lisp.msg.types.AddressFamilyIdentifierEnum.IP4;
 import java.net.InetSocketAddress;
 import java.net.InetAddress;
 
+import org.onosproject.lisp.msg.protocols.LispMessageReader;
+import org.onosproject.lisp.msg.protocols.LispMessageReaderFactory;
+
+
 public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
@@ -152,10 +156,11 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 			log.info(enoti.toString());
 			ByteBuf byteBuf = Unpooled.buffer();
 			enoti.writeTo(byteBuf);
-			ByteBuf byteBuf2 = Unpooled.buffer();
-			noti.writeTo(byteBuf2);
-			log.info(byteBuf.toString());
-			log.info(byteBuf2.toString());
+
+        LispMessageReader reader = LispMessageReaderFactory.getReader(byteBuf);
+        LispMessage message = (LispMessage) reader.readFrom(byteBuf);
+        message.configSender(noti.getSender());
+			log.info(message.toString());
 			ctx.writeAndFlush(new DatagramPacket(byteBuf, map.sxTR_public_RLOC, noti.getSender()));
 		}
 		else {
