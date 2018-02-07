@@ -17,7 +17,6 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.2.1" name="lisp-rtr-1.0-SNAPSHOT">
     <feature name="lisp-rtr" version="1.0-SNAPSHOT"
              description="ONOS OSGi bundle archetype.">
-        <feature>onos-lisp-ctl</feature>
-        <bundle>mvn:org.lisp/lisp-rtr/1.0-SNAPSHOT</bundle>
+	<bundle>mvn:org.onosproject/onos-lisp-ctl/1.10.2</bundle>
     </feature>
 </features>
