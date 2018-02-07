@@ -66,7 +66,8 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 			LispMessage innermsg = ecm.getControlMessage();
 			IP innerheader = ecm.innerIpHeader();		
 		        innermsg.configSender(ecm.getSender());
-	
+			log.info(ecm.getSender().toString());
+
 			if ( innermsg instanceof LispMapRegister ) {
 				log.info("ECM ms-register 1");
 				LispMapRegister reg = (LispMapRegister) innermsg;
@@ -82,7 +83,6 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 						IPv4 innerv4 = (IPv4) innerheader;
 						IpAddress ip = IpAddress.valueOf(innerv4.getSourceAddress());
 						IpAddress eid = ((LispIpv4Address)addr).getAddress();
-						log.info(ecm.getSender().toString());
 						log.info(eid.toString());
 						log.info(ip.toString());
 	
