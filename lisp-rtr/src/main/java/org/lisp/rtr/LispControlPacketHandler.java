@@ -99,7 +99,7 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 
 						//Re-originate map-register
 						ByteBuf byteBuf = Unpooled.buffer();
-					        ((LispMessage) ecm).writeTo(byteBuf);
+					        ((LispMessage) innermsg).writeTo(byteBuf);
 						InetAddress msaddr = (IpAddress.valueOf(innerv4.getDestinationAddress())).toInetAddress();
 						ctx.writeAndFlush(new DatagramPacket(byteBuf, new InetSocketAddress(msaddr, 4342)));
 					}
