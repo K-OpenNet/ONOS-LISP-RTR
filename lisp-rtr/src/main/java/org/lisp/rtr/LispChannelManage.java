@@ -58,7 +58,7 @@ public class LispChannelManage {
 	private Bootstrap control_boot;
 
 	public void initialize(RTRManager rtr) {
-		createBootstrap(rtr);
+//		createBootstrap(rtr);
 		controller.addMessageListener(new LispCtlMsgListener());
 	}
 
