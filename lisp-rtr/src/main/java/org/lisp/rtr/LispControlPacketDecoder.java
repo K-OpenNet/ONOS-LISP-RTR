@@ -30,6 +30,7 @@ public class LispControlPacketDecoder extends MessageToMessageDecoder<DatagramPa
     @Override
     protected void decode(ChannelHandlerContext ctx, DatagramPacket msg,
                           List<Object> list) throws Exception {
+	System.out.println("WTF");
         ByteBuf byteBuf = msg.content();
         LispMessageReader reader = LispMessageReaderFactory.getReader(byteBuf);
         LispMessage message = (LispMessage) reader.readFrom(byteBuf);
