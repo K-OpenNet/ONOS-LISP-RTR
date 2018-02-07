@@ -15,8 +15,16 @@
  */
 package org.lisp.rtr;
 
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.onosproject.lisp.ctl.LispController;
+import org.onosproject.lisp.ctl.LispMessageListener;
+import org.onosproject.lisp.ctl.LispRouterId;
+import org.onosproject.lisp.msg.protocols.LispMessage;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
@@ -37,6 +45,10 @@ import java.net.InetSocketAddress;
 public class LispChannelManage {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
+	
+	@Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
+	protected LispController controller;
+
 	private final int LISP_DATA_PORT = 4341;
 	private final int LISP_CONTROL_PORT = 4342;
 
@@ -47,6 +59,7 @@ public class LispChannelManage {
 
 	public void initialize(RTRManager rtr) {
 		createBootstrap(rtr);
+		controller.addMessageListener(new LispCtlMsgListener());
 	}
 
 	public void close() {
@@ -74,5 +87,16 @@ public class LispChannelManage {
 			e.printStackTrace();
 		}
 	}
-}
 
+	private class LispCtlMsgListener implements LispMessageListener {
+
+	        @Override
+        	public void handleIncomingMessage(LispRouterId routerId, LispMessage msg) {
+			log.info("WTF");
+	        }
+	
+	        @Override
+        	public void handleOutgoingMessage(LispRouterId routerId, LispMessage msg) {
+	        }	
+	}
+}
