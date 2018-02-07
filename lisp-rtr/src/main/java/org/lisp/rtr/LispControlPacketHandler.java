@@ -32,6 +32,7 @@ import io.netty.buffer.Unpooled;
 import org.onosproject.lisp.msg.protocols.LispMessage;
 import org.onosproject.lisp.msg.protocols.LispEncapsulatedControl;
 import org.onosproject.lisp.msg.protocols.LispMapRegister;
+import org.onosproject.lisp.msg.protocols.LispMapNotify;
 import org.onosproject.lisp.msg.protocols.LispMapRecord;
 import org.onosproject.lisp.msg.protocols.LispLocator;
 import org.onosproject.lisp.msg.protocols.DefaultLispMapRegister;
@@ -93,7 +94,8 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 						log.info(ip.toString());
 	
 						rtr.addMapcacheMapping(ecm.getSender(), record.getMaskLength(), eid.toInetAddress(),
-								ip.toInetAddress(), 0, 0);
+									ip.toInetAddress(), 0, 0, 
+										reg.getNonce());
 						/*
 						// Only support one locator
 						for ( LispLocator loc : record.getLocators() ) {
@@ -119,14 +121,23 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 						ctx.writeAndFlush(new DatagramPacket(byteBuf, new InetSocketAddress(msaddr, 4342)));
 					}
 				}
-		}
+			}
 			else {
 				log.info("Not supported");
 			}
 		}
+		else if ( msg instanceof LispMapNotify ) {
+			log.info("Map-notify");
+			LispMapNotify noti = (LispMapNotify)msg;
+
+			MapcacheEntry map = rtr.getMapcacheMapping(noti.getNonce());
+			log.info(map.sxTR_public_RLOC.toString());
+			ByteBuf byteBuf = Unpooled.buffer();
+			noti.writeTo(byteBuf);
+			ctx.writeAndFlush(new DatagramPacket(byteBuf, map.sxTR_public_RLOC, noti.getSender()));
+		}
 		else {
 			log.info("Not supported");
-
 		}
 	}
 

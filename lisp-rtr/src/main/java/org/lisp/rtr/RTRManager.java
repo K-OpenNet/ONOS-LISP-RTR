@@ -53,8 +53,12 @@ public class RTRManager {
 	        log.info("Stopped");
 	}
 
-	public void addMapcacheMapping(InetSocketAddress grloc, byte len, InetAddress prefix, InetAddress rloc, long id1, long id2) {
-		map.addMapping(grloc, len, prefix, rloc, id1, id2);
+	public void addMapcacheMapping(InetSocketAddress grloc, byte len, InetAddress prefix, InetAddress rloc, long id1, long id2, long nonce) {
+		map.addMapping(grloc, len, prefix, rloc, id1, id2, nonce);
 		log.info(Integer.toString(map.getSize()));
+	}
+
+	public MapcacheEntry getMapcacheMapping(long nonce) {
+		return map.getMapping(nonce);
 	}
 }

@@ -34,8 +34,8 @@ public class Mapcache {
 		mapDb = new ArrayList<MapcacheEntry>();
 	}
 
-	public void addMapping(InetSocketAddress grloc, byte len, InetAddress prefix, InetAddress rloc, long id1, long id2) {
-		MapcacheEntry entry = new MapcacheEntry(len, prefix, grloc, rloc, id1, id2);
+	public void addMapping(InetSocketAddress grloc, byte len, InetAddress prefix, InetAddress rloc, long id1, long id2, long nonce) {
+		MapcacheEntry entry = new MapcacheEntry(len, prefix, grloc, rloc, id1, id2, nonce);
 	
 		if ( !mapDb.contains(entry) )
 			mapDb.add(entry);
@@ -81,27 +81,17 @@ public class Mapcache {
 		return null;
 	}
 
+	// Nonce
+	public MapcacheEntry getMapping(long nonce) {
+		for ( MapcacheEntry entry : mapDb ) {
+			if ( entry.nonce == nonce )
+				return entry;
+		}
+		
+		return null;
+	}
+
 	public int getSize() {
 		return this.mapDb.size();
 	}
-
-	public class MapcacheEntry {
-
-		byte eidLen;
-		InetAddress eidPrefix;
-		InetSocketAddress sxTR_public_RLOC;
-		InetAddress sxTR_private_RLOC;
-		long[] sxTR_Id;
-
-		MapcacheEntry(byte len, InetAddress prefix, InetSocketAddress grloc, InetAddress rloc, long id1, long id2) {
-			this.eidLen = len;
-			this.eidPrefix = prefix;
-			this.sxTR_public_RLOC = grloc;
-			this.sxTR_private_RLOC = rloc;
-			this.sxTR_Id = new long[2];
-			this.sxTR_Id[0] = id1;
-			this.sxTR_Id[1] = id2;
-		}		
-	}
-
 }
