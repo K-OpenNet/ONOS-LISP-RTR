@@ -35,8 +35,11 @@ import org.onosproject.lisp.msg.protocols.LispMapRegister;
 import org.onosproject.lisp.msg.protocols.LispMapNotify;
 import org.onosproject.lisp.msg.protocols.LispMapRecord;
 import org.onosproject.lisp.msg.protocols.LispLocator;
+import org.onosproject.lisp.msg.protocols.LispEncapsulatedControl.EcmBuilder;
 import org.onosproject.lisp.msg.protocols.DefaultLispMapRegister;
 import org.onosproject.lisp.msg.protocols.DefaultLispMapRegister.DefaultRegisterBuilder;
+import org.onosproject.lisp.msg.protocols.DefaultLispEncapsulatedControl;
+import org.onosproject.lisp.msg.protocols.DefaultLispEncapsulatedControl.DefaultEcmBuilder;
 
 import org.onosproject.lisp.msg.authentication.LispAuthenticationConfig;
 
@@ -93,9 +96,10 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 						log.info(eid.toString());
 						log.info(ip.toString());
 	
-						rtr.addMapcacheMapping(ecm.getSender(), record.getMaskLength(), eid.toInetAddress(),
-									ip.toInetAddress(), 0, 0, 
-										reg.getNonce());
+						// MaskLeng, EID, GRLOC, PRLOC, xTR-ID, nonce, IP, UDP
+						rtr.addMapcacheMapping(new MapcacheEntry(record.getMaskLength(), eid.toInetAddress(), ecm.getSender(),
+									ip.toInetAddress(), 0, 0, reg.getNonce(),
+									ecm.innerIpHeader(), ecm.innerUdp()));
 						/*
 						// Only support one locator
 						for ( LispLocator loc : record.getLocators() ) {
@@ -125,12 +129,23 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 			else {
 				log.info("Not supported");
 			}
-		}
+}
 		else if ( msg instanceof LispMapNotify ) {
 			log.info("Map-notify");
 			LispMapNotify noti = (LispMapNotify)msg;
-
 			MapcacheEntry map = rtr.getMapcacheMapping(noti.getNonce());
+
+			IPv4 iph = (IPv4)map.iph;
+			int t = iph.getSourceAddress();
+			iph.setSourceAddress(iph.getDestinationAddress());
+			iph.setDestinationAddress(t);
+			EcmBuilder builder = new DefaultEcmBuilder();
+			LispEncapsulatedControl enoti = builder.isSecurity(false)
+								.innerIpHeader((IP)iph)
+								.innerUdpHeader(map.udh)
+								.innerLispMessage(noti)
+								.build();
+
 			log.info(map.sxTR_public_RLOC.toString());
 			ByteBuf byteBuf = Unpooled.buffer();
 			noti.writeTo(byteBuf);

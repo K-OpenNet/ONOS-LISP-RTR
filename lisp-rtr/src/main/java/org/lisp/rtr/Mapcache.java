@@ -21,6 +21,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.onlab.packet.IP;
+import org.onlab.packet.UDP;
+
 import java.net.InetSocketAddress;
 import java.net.InetAddress;
 
@@ -34,8 +37,13 @@ public class Mapcache {
 		mapDb = new ArrayList<MapcacheEntry>();
 	}
 
-	public void addMapping(InetSocketAddress grloc, byte len, InetAddress prefix, InetAddress rloc, long id1, long id2, long nonce) {
-		MapcacheEntry entry = new MapcacheEntry(len, prefix, grloc, rloc, id1, id2, nonce);
+	public void addMapping(MapcacheEntry entry) {
+		if ( !mapDb.contains(entry) )
+			mapDb.add(entry);
+	}
+
+	public void addMapping(InetSocketAddress grloc, byte len, InetAddress prefix, InetAddress rloc, long id1, long id2, long nonce, IP iph, UDP udh) {
+		MapcacheEntry entry = new MapcacheEntry(len, prefix, grloc, rloc, id1, id2, nonce, iph, udh);
 	
 		if ( !mapDb.contains(entry) )
 			mapDb.add(entry);
