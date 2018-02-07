@@ -147,6 +147,8 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 			DefaultEcmBuilder builder = new DefaultEcmBuilder();
 			log.info(iph.toString());
 			log.info(noti.toString());
+			iph.resetChecksum();
+			map.udh.resetChecksum();
 			DefaultLispEncapsulatedControl enoti = (DefaultLispEncapsulatedControl)(builder.isSecurity(false)
 								.innerIpHeader(iph)
 								.innerUdpHeader(map.udh)
@@ -156,7 +158,7 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 			log.info(enoti.toString());
 			ByteBuf byteBuf = Unpooled.buffer();
 			enoti.writeTo(byteBuf);
-
+			
 			ctx.writeAndFlush(new DatagramPacket(byteBuf, new InetSocketAddress(map.sxTR_public_RLOC.getAddress(), 4342), new InetSocketAddress("192.168.36.137", 4341)));
 		}
 		else {
