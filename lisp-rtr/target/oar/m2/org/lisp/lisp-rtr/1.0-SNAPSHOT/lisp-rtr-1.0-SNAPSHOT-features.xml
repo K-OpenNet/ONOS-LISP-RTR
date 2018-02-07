@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!--
-  ~ Copyright 2016-present Open Networking Laboratory
+  ~ Copyright 2015-present Open Networking Laboratory
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<features xmlns="http://karaf.apache.org/xmlns/features/v1.2.1" name="lisp-rtr-1.0-SNAPSHOT">
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.2.0" name="lisp-rtr-1.0-SNAPSHOT">
     <feature name="lisp-rtr" version="1.0-SNAPSHOT"
              description="ONOS OSGi bundle archetype.">
-	<bundle>mvn:org.onosproject/onos-lisp-ctl/1.10.2</bundle>
+        <feature>onos-api</feature>
+        <bundle>mvn:org.lisp/lisp-rtr/1.0-SNAPSHOT</bundle>
     </feature>
 </features>
