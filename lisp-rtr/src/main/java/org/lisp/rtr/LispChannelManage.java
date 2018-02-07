@@ -32,6 +32,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
+import java.net.InetSocketAddress;
+
 public class LispChannelManage {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
@@ -52,18 +54,25 @@ public class LispChannelManage {
 	}
 
 	private void createBootstrap(RTRManager rtr) {
-		control_boot = new Bootstrap();
-		control_group = new NioEventLoopGroup();
-		control_boot.group(control_group)
-		.channel(NioDatagramChannel.class)
-		.handler(new ChannelInitializer<NioDatagramChannel>() {
-			@Override
-			protected void initChannel(NioDatagramChannel socket) throws Exception {
-				ChannelPipeline pipe = socket.pipeline();
-				pipe.addLast("lisp_control_decoder", new LispControlPacketDecoder());
-				pipe.addLast("lisp_control_handler", new LispControlPacketHandler(rtr));
-			}	
-		});
+		
+		try {
+			control_boot = new Bootstrap();
+			control_group = new NioEventLoopGroup();
+			control_boot.group(control_group)
+			.channel(NioDatagramChannel.class)
+			.handler(new ChannelInitializer<NioDatagramChannel>() {
+				@Override
+				protected void initChannel(NioDatagramChannel socket) throws Exception {
+					ChannelPipeline pipe = socket.pipeline();
+					pipe.addLast("lisp_control_decoder", new LispControlPacketDecoder());
+					pipe.addLast("lisp_control_handler", new LispControlPacketHandler(rtr));
+				}	
+			});
+			control_boot.bind(new InetSocketAddress(LISP_CONTROL_PORT)).sync();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
 

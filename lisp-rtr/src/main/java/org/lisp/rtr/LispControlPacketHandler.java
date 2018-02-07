@@ -51,6 +51,7 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 	private RTRManager rtr;
 
 	public LispControlPacketHandler(RTRManager rtr) {
+		log.info("LISP control packet handler create");
 		this.rtr = rtr;	
 	}
 
