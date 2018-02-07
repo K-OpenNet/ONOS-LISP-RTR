@@ -95,6 +95,7 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 						IpAddress eid = ((LispIpv4Address)addr).getAddress();
 						log.info(eid.toString());
 						log.info(ip.toString());
+						log.info(ecm.innerIpHeader().toString());
 	
 						// MaskLeng, EID, GRLOC, PRLOC, xTR-ID, nonce, IP, UDP
 						rtr.addMapcacheMapping(new MapcacheEntry(record.getMaskLength(), eid.toInetAddress(), ecm.getSender(),
