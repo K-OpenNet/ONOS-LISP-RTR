@@ -90,7 +90,7 @@ public class LispChannelManage {
 
 	        @Override
         	public void handleIncomingMessage(LispRouterId routerId, LispMessage msg) {
-			log.info("WTF");
+			log.info("WTF??");
 	        }
 	
 	        @Override
