@@ -55,7 +55,7 @@ public class LispChannelManage {
 	private Bootstrap control_boot;
 
 	public void initialize(RTRManager rtr) {
-//		createBootstrap(rtr);
+		createBootstrap(rtr);
 //		controller.addMessageListener(new LispCtlMsgListener());
 	}
 
@@ -73,6 +73,7 @@ public class LispChannelManage {
 			.handler(new ChannelInitializer<NioDatagramChannel>() {
 				@Override
 				protected void initChannel(NioDatagramChannel socket) throws Exception {
+					log.info("good");
 					ChannelPipeline pipe = socket.pipeline();
 					pipe.addLast("lisp_control_decoder", new LispControlPacketDecoder());
 					pipe.addLast("lisp_control_handler", new LispControlPacketHandler(rtr));
