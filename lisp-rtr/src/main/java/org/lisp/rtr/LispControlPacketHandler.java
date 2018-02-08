@@ -163,11 +163,10 @@ public class LispControlPacketHandler {
 			// Try to send buffered packet
 			ArrayList<LispDataPacket> pkts = rtr.getPacket();
 			log.info(Integer.toString(pkts.size()));
-			for ( LispMessage pkt : pkts ) {
+			for ( LispDataPacket pkt : pkts ) {
 				log.info("forwarding?");
-				LispDataPacket dpkt = (LispDataPacket)msg;
 				log.info("0");
-				IP iph = dpkt.getIP();
+				IP iph = pkt.getIP();
 				log.info("1");
 				log.info(Integer.toString(((IPv4)iph).getDestinationAddress()));
 				log.info("2");
@@ -184,7 +183,7 @@ public class LispControlPacketHandler {
 					else {
 						// Forwarding
 						log.info("forwarded");
-						list.add(new DatagramPacket(dpkt.getContent(), map.sxTR_public_RLOC));
+						list.add(new DatagramPacket(pkt.getContent(), map.sxTR_public_RLOC));
 					}
 			}
 		}
