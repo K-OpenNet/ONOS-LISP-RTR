@@ -69,11 +69,7 @@ public class LispDataPacketHandler {
 			InetAddress dnetip = dip.toInetAddress();
 			MapcacheEntry map = rtr.getMapcacheMapping(dnetip);
 			
-			if ( map != null ) 
-				log.info("WTF?");
-			log.info(snetip.toString());
-			log.info(dnetip.toString());
-		
+			if ( map == null )	
 			{
 				// Need to send map-request 
 				log.info("1");
@@ -122,9 +118,14 @@ public class LispDataPacketHandler {
 					log.info("ECM write");
 				}
 				catch ( Exception e ) {
-					log.info("fucked");
 				}
+				// Buffering packets
+				rtr.addPacket(msg);
 			}	
+			else {
+				// Forwarding
+				list.add(new DatagramPacket(((LispDataPacket)msg).getContent(), map.sxTR_public_RLOC));
+			}
 		}	
 		return list;
 	}

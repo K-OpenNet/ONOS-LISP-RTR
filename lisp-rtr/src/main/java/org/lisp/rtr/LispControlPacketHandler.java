@@ -159,6 +159,26 @@ public class LispControlPacketHandler {
 					}
 				}
 			}
+	
+			// Try to send buffered packet
+			ArrayList<LispMessage> pkts = rtr.getPacket();
+			for ( LispMessage pkt : pkts ) {
+				LispDataPacket dpkt = (LispDataPacket)msg;
+				IP iph = dpkt.getIP();
+				if ( iph.getVersion() == 4 ) {
+					IpAddress dip = IpAddress.valueOf(((IPv4)iph).getDestinationAddress());
+					InetAddress dnetip = dip.toInetAddress();
+
+					MapcacheEntry map = rtr.getMapcacheMapping(dnetip);
+				
+					if ( map == null )
+						continue;
+					else {
+						// Forwarding
+						list.add(new DatagramPacket(dpkt.getContent(), map.sxTR_public_RLOC));
+					}
+				}
+			}
 		}
 		else if ( msg instanceof LispMapNotify ) {
 			log.info("Map-notify");
