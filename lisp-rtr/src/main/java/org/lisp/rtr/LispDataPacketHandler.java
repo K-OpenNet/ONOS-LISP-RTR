@@ -68,6 +68,7 @@ public class LispDataPacketHandler extends ChannelInboundHandlerAdapter {
 			log.info(test.toString());
 		}	
 */
+		ctx.fireChannelActive();
 	}
 
 	@Override

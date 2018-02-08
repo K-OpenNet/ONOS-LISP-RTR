@@ -72,7 +72,7 @@ public class LispChannelManage {
 					log.info("good");
 					ChannelPipeline pipe = socket.pipeline();
 					pipe.addLast("lisp_control_decoder", new LispControlPacketDecoder());
-			//		pipe.addLast("lisp_data_handler", new LispDataPacketHandler(rtr));
+					pipe.addLast("lisp_data_handler", new LispDataPacketHandler(rtr));
 					pipe.addLast("lisp_control_handler", new LispControlPacketHandler(rtr));
 				}	
 			});
