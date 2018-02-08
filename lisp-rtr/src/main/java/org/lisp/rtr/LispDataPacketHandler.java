@@ -49,6 +49,7 @@ public class LispDataPacketHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+/*
 		DatagramPacket packet = (DatagramPacket)msg;
 		System.out.println("data decode 1");
 		System.out.println(Integer.toString(packet.recipient().getPort()));	
@@ -66,6 +67,7 @@ public class LispDataPacketHandler extends ChannelInboundHandlerAdapter {
 			IpAddress test = IpAddress.valueOf(((IPv4)innerIpHeader).getDestinationAddress());
 			log.info(test.toString());
 		}	
+*/
 	}
 
 	@Override
