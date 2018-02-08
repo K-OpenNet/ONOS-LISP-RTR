@@ -42,7 +42,7 @@ public class RTRManager {
 
 	private Mapcache map = new Mapcache();
 	private LispChannelManager channel = new LispChannelManager();
-	private ArrayList<LispMessage> pktBuf = new ArrayList<LispMessage>();
+	private ArrayList<LispDataPacket> pktBuf = new ArrayList<LispDataPacket>();
 
 	@Activate
 	protected void activate() {
@@ -69,12 +69,12 @@ public class RTRManager {
 		return map.getMapping(addr);
 	}
 
-	public void addPacket(LispMessage msg) {
+	public void addPacket(LispDataPacket msg) {
 		log.info("addPacket " + Integer.toString(pktBuf.size()));
 		pktBuf.add(msg);
 	}
 
-	public ArrayList<LispMessage> getPacket() {
+	public ArrayList<LispDataPacket> getPacket() {
 		return pktBuf;
 	}
 }

@@ -122,7 +122,7 @@ public class LispDataPacketHandler {
 				catch ( Exception e ) {
 				}
 				// Buffering packets
-				rtr.addPacket(msg);
+				rtr.addPacket((LispDataPacket)msg);
 			}	
 			else {
 				// Forwarding
