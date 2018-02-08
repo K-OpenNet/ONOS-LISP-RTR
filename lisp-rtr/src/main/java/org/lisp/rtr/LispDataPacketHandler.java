@@ -28,12 +28,16 @@ import io.netty.buffer.Unpooled;
 import org.onlab.packet.IP;
 import org.onlab.packet.IpAddress;
 import org.onlab.packet.IPv4;
+import org.onlab.packet.Ip4Address;
+import org.onlab.packet.UDP;
 import org.onosproject.lisp.msg.types.LispAfiAddress;
 import org.onosproject.lisp.msg.types.LispIpv4Address;
 import static org.onosproject.lisp.msg.types.AddressFamilyIdentifierEnum.IP4;
 
 import org.onosproject.lisp.msg.protocols.LispMessage;
 import org.onosproject.lisp.msg.protocols.DefaultLispMapRequest.DefaultRequestBuilder;
+import org.onosproject.lisp.msg.protocols.LispEncapsulatedControl;
+import org.onosproject.lisp.msg.protocols.DefaultLispEncapsulatedControl.DefaultEcmBuilder;
 import org.onosproject.lisp.msg.protocols.LispMapRequest;
 import org.onosproject.lisp.msg.protocols.LispEidRecord;
 
@@ -71,7 +75,7 @@ public class LispDataPacketHandler {
 			log.info(dnetip.toString());
 		
 			{
-				// Need to send map-request
+				// Need to send map-request 
 				ArrayList<LispAfiAddress> itr = new ArrayList<LispAfiAddress>();
 				itr.add(new LispIpv4Address(IpAddress.valueOf("192.168.36.137")));
 				ArrayList<LispEidRecord> eidrec = new ArrayList<LispEidRecord>();
@@ -89,6 +93,20 @@ public class LispDataPacketHandler {
 							.withNonce(new Random().nextLong())
 							.withReplyRecord(1)
 							.build();
+				
+				// Encapsulated
+				IPv4 eiph = new IPv4();
+				eiph.setSourceAddress(((Ip4Address)IpAddress.valueOf("192.168.36.137")).toInt());
+				eiph.setDestinationAddress(((Ip4Address)IpAddress.valueOf("192.168.36.133")).toInt());
+				UDP eudh = new UDP();
+				eudh.setSourcePort(4342);
+				eudh.setDestinationPort(4342);
+				LispEncapsulatedControl ecm = new DefaultEcmBuilder()
+							.isSecurity(false)
+							.innerIpHeader(eiph)
+							.innerUdpHeader(eudh)
+							.innerLispMessage(req)
+							.build();	
 				ByteBuf byteBuf = Unpooled.buffer();
 				try {
 					req.writeTo(byteBuf);
