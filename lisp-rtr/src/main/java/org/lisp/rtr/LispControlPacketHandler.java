@@ -167,6 +167,9 @@ public class LispControlPacketHandler {
 				log.info("forwarding?");
 				LispDataPacket dpkt = (LispDataPacket)msg;
 				IP iph = dpkt.getIP();
+				log.info("1");
+				log.info(Integer.toString(((IPv4)iph).getDestinationAddress()));
+				log.info("2");
 					IpAddress dip = IpAddress.valueOf(((IPv4)iph).getDestinationAddress());
 					InetAddress dnetip = dip.toInetAddress();
 					log.info(dip.toString());
