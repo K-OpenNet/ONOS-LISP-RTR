@@ -50,7 +50,8 @@ public class LispDataPacketHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		DatagramPacket packet = (DatagramPacket)msg;
-	
+		System.out.println("data decode 1");
+		System.out.println(Integer.toString(packet.recipient().getPort()));	
 		if ( packet.recipient().getPort() == 4341 ) {
 			log.info("LISP data incoming msg");		
 			ByteBuf byteBuf = (ByteBuf)msg;

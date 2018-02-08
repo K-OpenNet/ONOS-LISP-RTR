@@ -30,6 +30,8 @@ public class LispControlPacketDecoder extends MessageToMessageDecoder<DatagramPa
     @Override
     protected void decode(ChannelHandlerContext ctx, DatagramPacket msg,
                           List<Object> list) throws Exception {
+	System.out.println("decode 1");
+	System.out.println(Integer.toString(msg.recipient().getPort()));
 	if ( msg.recipient().getPort() == 4342 ) {
 		// Control packet
 	        ByteBuf byteBuf = msg.content();
