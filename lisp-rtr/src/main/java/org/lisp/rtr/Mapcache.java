@@ -84,9 +84,14 @@ public class Mapcache {
 
 			if ( pass && t2 != 0 ) {
 				byte t3 = (byte)(255 << ( 8 - t2));
-				if ( (addr[t1] & t3) != (eidaddr[t1] & t3) )
+				if ( (addr[t1] & t3) != (eidaddr[t1] & t3) ) {
+					pass = false;
 					continue;
+				}
 			}
+
+			if ( pass )
+				return entry;
 		}
 
 		return null;
