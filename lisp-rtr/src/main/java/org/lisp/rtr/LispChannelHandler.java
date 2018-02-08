@@ -34,6 +34,7 @@ import static org.onosproject.lisp.msg.types.AddressFamilyIdentifierEnum.IP4;
 
 import org.onosproject.lisp.msg.protocols.LispMessage;
 
+import java.util.ArrayList;
 import java.net.InetSocketAddress;
 import java.net.InetAddress;
 
@@ -55,7 +56,7 @@ public class LispChannelHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		DatagramPacket result;
+		ArrayList<DatagramPacket> result;
 
 		if ( ((LispMessage)msg).getType() == null ) {
 			// Data packet
@@ -66,7 +67,8 @@ public class LispChannelHandler extends ChannelInboundHandlerAdapter {
 			result = ctrl.processPkt((LispMessage)msg);
 		}
 		
-		ctx.writeAndFlush(result);
+		for ( DatagramPacket pkt : result )
+			ctx.writeAndFlush(pkt);
 	}
 
 	@Override

@@ -33,7 +33,12 @@ import org.onosproject.lisp.msg.types.LispIpv4Address;
 import static org.onosproject.lisp.msg.types.AddressFamilyIdentifierEnum.IP4;
 
 import org.onosproject.lisp.msg.protocols.LispMessage;
+import org.onosproject.lisp.msg.protocols.DefaultLispMapRequest.DefaultRequestBuilder;
+import org.onosproject.lisp.msg.protocols.LispMapRequest;
+import org.onosproject.lisp.msg.protocols.LispEidRecord;
 
+import java.util.ArrayList;
+import java.util.Random;
 import java.net.InetSocketAddress;
 import java.net.InetAddress;
 
@@ -49,8 +54,48 @@ public class LispDataPacketHandler {
 		this.rtr = rtr;	
 	}
 
-	public DatagramPacket processPkt(LispMessage msg) {
-		return null;
+	public ArrayList<DatagramPacket> processPkt(LispMessage msg) {
+		IP iph = ((LispDataPacket)msg).getIP();
+		ArrayList<DatagramPacket> list = new ArrayList<DatagramPacket>();
+
+		if ( iph.getVersion() == 4 ) {
+			IpAddress sip = IpAddress.valueOf(((IPv4)iph).getSourceAddress());
+			InetAddress snetip = sip.toInetAddress();
+			IpAddress dip = IpAddress.valueOf(((IPv4)iph).getDestinationAddress());
+			InetAddress dnetip = dip.toInetAddress();
+			MapcacheEntry map = rtr.getMapcacheMapping(dnetip);
+
+			if ( map == null ) {
+				// Need to send map-request
+				ArrayList<LispAfiAddress> itr = new ArrayList<LispAfiAddress>();
+				itr.add(new LispIpv4Address(IpAddress.valueOf("192.168.36.137")));
+				ArrayList<LispEidRecord> eidrec = new ArrayList<LispEidRecord>();
+				eidrec.add(new LispEidRecord((byte) 32, new LispIpv4Address(dip)));
+        			LispMapRequest req = new DefaultRequestBuilder()
+							.withIsAuthoritative(true)
+							.withIsMapDataPresent(true)
+							.withIsPitr(false)
+							.withIsProbe(false)
+							.withIsSmr(false)
+							.withIsSmrInvoked(false)
+							.withSourceEid(new LispIpv4Address(sip))
+							.withItrRlocs(itr)
+							.withEidRecords(eidrec)
+							.withNonce(new Random().nextLong())
+							.withReplyRecord(1)
+							.build();
+				ByteBuf byteBuf = Unpooled.buffer();
+				try {
+					req.writeTo(byteBuf);
+					list.add(new DatagramPacket(byteBuf, new InetSocketAddress("192.168.36.133", 4342)));
+				}
+				catch ( Exception e ) {
+				}
+			}	
+			else {
+
+			}
+		}	
+		return list;
 	}
 }	
-

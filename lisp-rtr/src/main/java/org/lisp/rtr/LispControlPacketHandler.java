@@ -46,6 +46,7 @@ import org.onosproject.lisp.msg.types.LispAfiAddress;
 import org.onosproject.lisp.msg.types.LispIpv4Address;
 import static org.onosproject.lisp.msg.types.AddressFamilyIdentifierEnum.IP4;
 
+import java.util.ArrayList;
 import java.net.InetSocketAddress;
 import java.net.InetAddress;
 
@@ -65,9 +66,9 @@ public class LispControlPacketHandler {
 		this.rtr = rtr;	
 	}
 
-	public DatagramPacket processPkt(LispMessage msg) {
+	public ArrayList<DatagramPacket> processPkt(LispMessage msg) {
 		log.info("LISP incoming msg");		
-		DatagramPacket result = null;
+		ArrayList<DatagramPacket> list = new ArrayList<DatagramPacket>();
 
 		// Only process ECM-mapregister
 		if ( msg instanceof LispEncapsulatedControl ) {
@@ -125,7 +126,7 @@ public class LispControlPacketHandler {
 						try {
 							ByteBuf byteBuf = Unpooled.buffer();
 							authRegister.writeTo(byteBuf);
-							result = new DatagramPacket(byteBuf, new InetSocketAddress(msaddr, 4342));
+							list.add(new DatagramPacket(byteBuf, new InetSocketAddress(msaddr, 4342)));
 	//						ctx.writeAndFlush(new DatagramPacket(byteBuf, new InetSocketAddress(msaddr, 4342)));
 						}
 						catch ( Exception e ) {
@@ -178,7 +179,7 @@ public class LispControlPacketHandler {
 				try {
 					ByteBuf byteBuf = Unpooled.buffer();
 					enoti.writeTo(byteBuf);
-					result = new DatagramPacket(byteBuf, new InetSocketAddress(map.sxTR_public_RLOC.getAddress(), 4342), new InetSocketAddress("192.168.36.137", 4341));
+					list.add(new DatagramPacket(byteBuf, new InetSocketAddress(map.sxTR_public_RLOC.getAddress(), 4342), new InetSocketAddress("192.168.36.137", 4341)));
 				}	
 				catch ( Exception e ) {
 	
@@ -191,6 +192,6 @@ public class LispControlPacketHandler {
 			log.info("Not supported");
 		}	
 
-		return result;
+		return list;
 	}
 }	

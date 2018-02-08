@@ -33,6 +33,8 @@ import org.onosproject.lisp.msg.protocols.LispMessage;
 import java.net.InetSocketAddress;
 import java.net.InetAddress;
 
+import java.util.ArrayList;
+
 @Component(immediate = true)
 public class RTRManager {
 
@@ -40,6 +42,7 @@ public class RTRManager {
 
 	private Mapcache map = new Mapcache();
 	private LispChannelManager channel = new LispChannelManager();
+	private ArrayList<LispMessage> pktBuf = new ArrayList<LispMessage>();
 
 	@Activate
 	protected void activate() {
@@ -62,8 +65,15 @@ public class RTRManager {
 		return map.getMapping(nonce);
 	}
 
-	public MapcacheEntry getMapcacheMapping(InetSocketAddress addr) {
-	//	return map.getMapping(addr);
-		return null;
+	public MapcacheEntry getMapcacheMapping(InetAddress addr) {
+		return map.getMapping(addr);
+	}
+
+	public void addPacket(LispMessage msg) {
+		pktBuf.add(msg);
+	}
+
+	public ArrayList<LispMessage> getPacket() {
+		return pktBuf;
 	}
 }

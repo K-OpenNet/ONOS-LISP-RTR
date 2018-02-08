@@ -55,13 +55,8 @@ public class LispPacketDecoder extends MessageToMessageDecoder<DatagramPacket> {
 		log.info("data 1");
 		ByteBuf content = msg.content().copy();
 		LispDataPacket.DataPacketReader reader = new LispDataPacket.DataPacketReader();
-		log.info("data 2");
 		LispMessage message = reader.readFrom(msg.content(), content);
-		log.info("data 3");
 		list.add(message);
-
-		ctx.writeAndFlush(new DatagramPacket(((LispDataPacket)message).getContent(),
-			new InetSocketAddress("192.168.36.133", 4342)));
 	}
    }
 }

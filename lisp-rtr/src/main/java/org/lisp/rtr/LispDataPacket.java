@@ -74,6 +74,10 @@ public final class LispDataPacket implements LispMessage {
 		return this.content;
 	}
 
+	public IP getIP() {
+		return this.iph;
+	}
+
 	public static final class DataPacketBuilder implements Builder {
 
         	@Override
