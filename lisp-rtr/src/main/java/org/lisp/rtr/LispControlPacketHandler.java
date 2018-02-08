@@ -147,7 +147,8 @@ public class LispControlPacketHandler {
 						for ( LispLocator loc : record.getLocators() ) {
 							LispAfiAddress locator = loc.getLocatorAfi();
 							IpAddress iplocator = ((LispIpv4Address)locator).getAddress();
-
+							log.info(eid.toInetAddress().toString());
+							log.info(iplocator.toString());
 							rtr.addMapcacheMapping(new MapcacheEntry(record.getMaskLength(), eid.toInetAddress(), new InetSocketAddress(iplocator.toInetAddress(), 4342),
 								null, 0, 0, rep.getNonce(),
 								null, null));
