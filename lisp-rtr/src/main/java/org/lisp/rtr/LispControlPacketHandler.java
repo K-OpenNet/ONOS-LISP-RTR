@@ -133,31 +133,31 @@ public class LispControlPacketHandler {
 					}
 				}
 			}
-			else if ( innermsg instanceof LispMapReply ) {
-				log.info("ECM ms-reply 1");
-				LispMapReply rep = (LispMapReply) innermsg;
+			else {
+				log.info("Not supported ecm");
+			}			
+		}
+		else if ( msg instanceof LispMapReply ) {
+			log.info("Map-reply 1");
+			LispMapReply rep = (LispMapReply) msg;
 
-				// Create mapcache
-				for ( LispMapRecord record : rep.getMapRecords() ) {
-					log.info("ECM ms-reply 2");	
-					LispAfiAddress addr = record.getEidPrefixAfi();
-	
-					if ( innerheader.getVersion() == 4 && addr.getAfi() == IP4 ) {
-						IpAddress eid = ((LispIpv4Address)addr).getAddress();
-						for ( LispLocator loc : record.getLocators() ) {
-							LispAfiAddress locator = loc.getLocatorAfi();
-							IpAddress iplocator = ((LispIpv4Address)locator).getAddress();
-							log.info(eid.toInetAddress().toString());
-							log.info(iplocator.toString());
-							rtr.addMapcacheMapping(new MapcacheEntry(record.getMaskLength(), eid.toInetAddress(), new InetSocketAddress(iplocator.toInetAddress(), 4342),
-								null, 0, 0, rep.getNonce(),
-								null, null));
-						}
+			// Create mapcache
+			for ( LispMapRecord record : rep.getMapRecords() ) {
+				log.info("Map-reply 2");	
+				LispAfiAddress addr = record.getEidPrefixAfi();
+
+				if ( addr.getAfi() == IP4 ) {
+					IpAddress eid = ((LispIpv4Address)addr).getAddress();
+					for ( LispLocator loc : record.getLocators() ) {
+						LispAfiAddress locator = loc.getLocatorAfi();
+						IpAddress iplocator = ((LispIpv4Address)locator).getAddress();
+						log.info(eid.toInetAddress().toString());
+						log.info(iplocator.toString());
+						rtr.addMapcacheMapping(new MapcacheEntry(record.getMaskLength(), eid.toInetAddress(), new InetSocketAddress(iplocator.toInetAddress(), 4342),
+							null, 0, 0, rep.getNonce(),
+							null, null));
 					}
 				}
-			}
-			else {
-				log.info("Not supported");
 			}
 		}
 		else if ( msg instanceof LispMapNotify ) {
