@@ -70,6 +70,7 @@ public class RTRManager {
 	}
 
 	public void addPacket(LispMessage msg) {
+		log.info("addPacket " + Integer.toString(pktBuf.size()));
 		pktBuf.add(msg);
 	}
 
