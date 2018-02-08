@@ -64,8 +64,13 @@ public class LispDataPacketHandler {
 			IpAddress dip = IpAddress.valueOf(((IPv4)iph).getDestinationAddress());
 			InetAddress dnetip = dip.toInetAddress();
 			MapcacheEntry map = rtr.getMapcacheMapping(dnetip);
-
-			if ( map == null ) {
+			
+			if ( map != null ) 
+				log.info("WTF?");
+			log.info(snetip.toString());
+			log.info(dnetip.toString());
+		
+			{
 				// Need to send map-request
 				ArrayList<LispAfiAddress> itr = new ArrayList<LispAfiAddress>();
 				itr.add(new LispIpv4Address(IpAddress.valueOf("192.168.36.137")));
@@ -92,9 +97,6 @@ public class LispDataPacketHandler {
 				catch ( Exception e ) {
 				}
 			}	
-			else {
-
-			}
 		}	
 		return list;
 	}

@@ -64,6 +64,8 @@ public class Mapcache {
 
 	// xTR <-> RTR for data packets forwarding
 	public MapcacheEntry getMapping(InetAddress eid) {
+		log.info("map cache");
+		log.info(eid.toString());
 		byte[] eidaddr = eid.getAddress();
 
 		for ( MapcacheEntry entry : mapDb ) {
@@ -72,17 +74,18 @@ public class Mapcache {
 			byte t2 = (byte)(entry.eidLen % 8);
 			byte[] addr = entry.eidPrefix.getAddress();
 
+			boolean pass = true;
 			for ( byte t = 0 ; t < t1 ; t++ ) {
-				if ( addr[t] != eidaddr[t] )
-					continue;
-
-				if ( t2 != 0 ) {
-					byte t3 = (byte)(255 << ( 8 - t2));
-					if ( (addr[t1] & t3) != (eidaddr[t1] & t3) )
-						continue;
+				if ( addr[t] != eidaddr[t] ) {
+					pass = false;
+					break;
 				}
-	
-				return entry;
+			}
+
+			if ( pass && t2 != 0 ) {
+				byte t3 = (byte)(255 << ( 8 - t2));
+				if ( (addr[t1] & t3) != (eidaddr[t1] & t3) )
+					continue;
 			}
 		}
 
