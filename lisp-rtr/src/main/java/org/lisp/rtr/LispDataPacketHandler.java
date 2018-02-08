@@ -98,8 +98,10 @@ public class LispDataPacketHandler {
 				log.info("3");
 				// Encapsulated
 				IPv4 eiph = new IPv4();
+				log.info("3.1");
 				eiph.setSourceAddress(((Ip4Address)IpAddress.valueOf("192.168.36.137")).toInt());
 				eiph.setDestinationAddress(((Ip4Address)IpAddress.valueOf("192.168.36.133")).toInt());
+				log.info("3.2");
 				UDP eudh = new UDP();
 				eudh.setSourcePort(4342);
 				eudh.setDestinationPort(4342);
