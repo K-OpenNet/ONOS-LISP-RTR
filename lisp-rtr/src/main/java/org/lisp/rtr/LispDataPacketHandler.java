@@ -109,8 +109,9 @@ public class LispDataPacketHandler {
 							.build();	
 				ByteBuf byteBuf = Unpooled.buffer();
 				try {
-					req.writeTo(byteBuf);
+					ecm.writeTo(byteBuf);
 					list.add(new DatagramPacket(byteBuf, new InetSocketAddress("192.168.36.133", 4342)));
+					log.info("ECM write");
 				}
 				catch ( Exception e ) {
 				}
