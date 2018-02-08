@@ -15,6 +15,10 @@
  */
 package org.lisp.rtr;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
@@ -27,13 +31,17 @@ import java.util.List;
 
 public class LispPacketDecoder extends MessageToMessageDecoder<DatagramPacket> {
 
-    @Override
-    protected void decode(ChannelHandlerContext ctx, DatagramPacket msg,
-                          List<Object> list) throws Exception {
-	System.out.println("decode 1");
-	System.out.println(Integer.toString(msg.recipient().getPort()));
+	private final Logger log = LoggerFactory.getLogger(getClass());
+	
+	@Override
+	protected void decode(ChannelHandlerContext ctx, DatagramPacket msg, List<Object> list) throws Exception {
+
+
+	log.info("decode 1");
+	log.info(Integer.toString(msg.recipient().getPort()));
 	if ( msg.recipient().getPort() == 4342 ) {
 		// Control packet
+		log.info("control 1");
 	        ByteBuf byteBuf = msg.content();
 	        LispMessageReader reader = LispMessageReaderFactory.getReader(byteBuf);
         	LispMessage message = (LispMessage) reader.readFrom(byteBuf);
@@ -41,10 +49,13 @@ public class LispPacketDecoder extends MessageToMessageDecoder<DatagramPacket> {
         	list.add(message);
     	}
 	else {
-		// Data packet
+		// Data packetA
+		log.info("data 1");
 		ByteBuf content = msg.content().copy();
 		LispDataPacket.DataPacketReader reader = new LispDataPacket.DataPacketReader();
+		log.info("data 2");
 		LispMessage message = reader.readFrom(msg.content(), content);
+		log.info("data 3");
 		list.add(message);
 	}
    }
