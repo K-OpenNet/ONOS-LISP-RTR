@@ -18,10 +18,6 @@ package org.lisp.rtr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.felix.scr.annotations.Service;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.ReferenceCardinality;
-
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
@@ -134,11 +130,30 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 			else {
 				log.info("Not supported");
 			}
-}
+		}
 		else if ( msg instanceof LispMapNotify ) {
 			log.info("Map-notify");
 			LispMapNotify noti = (LispMapNotify)msg;
 			MapcacheEntry map = rtr.getMapcacheMapping(noti.getNonce());
+
+			if ( map == null ) {
+				// This map-request for own cache
+				log.info("Map-notify for this RTR");
+				for ( LispMapRecord record : noti.getMapRecords() ) {
+					LispAfiAddress addr = record.getEidPrefixAfi();
+					IpAddress eid = ((LispIpv4Address)addr).getAddress();
+					for ( LispLocator loc : record.getLocators() ) {
+						LispAfiAddress locator = loc.getLocatorAfi();
+						IpAddress iplocator = ((LispIpv4Address)locator).getAddress();
+						log.info(eid.toInetAddress().toString());
+						log.info(iplocator.toInetAddress().toString());
+						MapcacheEntry lmap = new MapcacheEntry(record.getMaskLength(), eid.toInetAddress(), new InetSocketAddress(iplocator.toInetAddress(), 4341), null,
+							0, 0, noti.getNonce(), null, null);
+					}
+				}			
+
+				return;
+			}
 
 			IPv4 iph = (IPv4)map.iph;
 			int t = iph.getSourceAddress();

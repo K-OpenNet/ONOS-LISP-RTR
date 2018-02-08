@@ -61,4 +61,9 @@ public class RTRManager {
 	public MapcacheEntry getMapcacheMapping(long nonce) {
 		return map.getMapping(nonce);
 	}
+
+	public MapcacheEntry getMapcacheMapping(InetSocketAddress addr) {
+	//	return map.getMapping(addr);
+		return null;
+	}
 }
