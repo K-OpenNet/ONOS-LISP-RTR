@@ -76,10 +76,12 @@ public class LispDataPacketHandler {
 		
 			{
 				// Need to send map-request 
+				log.info("1");
 				ArrayList<LispAfiAddress> itr = new ArrayList<LispAfiAddress>();
 				itr.add(new LispIpv4Address(IpAddress.valueOf("192.168.36.137")));
 				ArrayList<LispEidRecord> eidrec = new ArrayList<LispEidRecord>();
 				eidrec.add(new LispEidRecord((byte) 32, new LispIpv4Address(dip)));
+				log.info("2");
         			LispMapRequest req = new DefaultRequestBuilder()
 							.withIsAuthoritative(true)
 							.withIsMapDataPresent(true)
@@ -93,7 +95,7 @@ public class LispDataPacketHandler {
 							.withNonce(new Random().nextLong())
 							.withReplyRecord(1)
 							.build();
-				
+				log.info("3");
 				// Encapsulated
 				IPv4 eiph = new IPv4();
 				eiph.setSourceAddress(((Ip4Address)IpAddress.valueOf("192.168.36.137")).toInt());
@@ -101,6 +103,7 @@ public class LispDataPacketHandler {
 				UDP eudh = new UDP();
 				eudh.setSourcePort(4342);
 				eudh.setDestinationPort(4342);
+				log.info("4");
 				LispEncapsulatedControl ecm = new DefaultEcmBuilder()
 							.isSecurity(false)
 							.innerIpHeader(eiph)
