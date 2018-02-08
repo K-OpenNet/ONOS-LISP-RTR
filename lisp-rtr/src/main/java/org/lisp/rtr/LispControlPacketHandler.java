@@ -28,6 +28,7 @@ import io.netty.buffer.Unpooled;
 import org.onosproject.lisp.msg.protocols.LispMessage;
 import org.onosproject.lisp.msg.protocols.LispEncapsulatedControl;
 import org.onosproject.lisp.msg.protocols.LispMapRegister;
+import org.onosproject.lisp.msg.protocols.LispMapReply;
 import org.onosproject.lisp.msg.protocols.LispMapNotify;
 import org.onosproject.lisp.msg.protocols.LispMapRecord;
 import org.onosproject.lisp.msg.protocols.LispLocator;
@@ -84,7 +85,6 @@ public class LispControlPacketHandler {
 				LispMapRegister reg = (LispMapRegister) innermsg;
 
 				// Create mapcache
-				log.info(Integer.toString(reg.getMapRecords().size()));
 				for ( LispMapRecord record : reg.getMapRecords() ) {
 					log.info("ECM ms-register 2");
 					LispAfiAddress addr = record.getEidPrefixAfi();
@@ -127,9 +127,30 @@ public class LispControlPacketHandler {
 							ByteBuf byteBuf = Unpooled.buffer();
 							authRegister.writeTo(byteBuf);
 							list.add(new DatagramPacket(byteBuf, new InetSocketAddress(msaddr, 4342)));
-	//						ctx.writeAndFlush(new DatagramPacket(byteBuf, new InetSocketAddress(msaddr, 4342)));
 						}
 						catch ( Exception e ) {
+						}
+					}
+				}
+			}
+			else if ( innermsg instanceof LispMapReply ) {
+				log.info("ECM ms-reply 1");
+				LispMapReply rep = (LispMapReply) innermsg;
+
+				// Create mapcache
+				for ( LispMapRecord record : rep.getMapRecords() ) {
+					log.info("ECM ms-reply 2");	
+					LispAfiAddress addr = record.getEidPrefixAfi();
+	
+					if ( innerheader.getVersion() == 4 && addr.getAfi() == IP4 ) {
+						IpAddress eid = ((LispIpv4Address)addr).getAddress();
+						for ( LispLocator loc : record.getLocators() ) {
+							LispAfiAddress locator = loc.getLocatorAfi();
+							IpAddress iplocator = ((LispIpv4Address)locator).getAddress();
+
+							rtr.addMapcacheMapping(new MapcacheEntry(record.getMaskLength(), eid.toInetAddress(), new InetSocketAddress(iplocator.toInetAddress(), 4342),
+								null, 0, 0, rep.getNonce(),
+								null, null));
 						}
 					}
 				}
