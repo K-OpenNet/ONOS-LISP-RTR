@@ -25,7 +25,7 @@ import org.onosproject.lisp.msg.protocols.LispMessageReaderFactory;
 
 import java.util.List;
 
-public class LispControlPacketDecoder extends MessageToMessageDecoder<DatagramPacket> {
+public class LispPacketDecoder extends MessageToMessageDecoder<DatagramPacket> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, DatagramPacket msg,
@@ -40,6 +40,13 @@ public class LispControlPacketDecoder extends MessageToMessageDecoder<DatagramPa
 	        message.configSender(msg.sender());
         	list.add(message);
     	}
+	else {
+		// Data packet
+		ByteBuf content = msg.content().copy();
+		LispDataPacket.DataPacketReader reader = new LispDataPacket.DataPacketReader();
+		LispMessage message = reader.readFrom(msg.content(), content);
+		list.add(message);
+	}
    }
 }
 

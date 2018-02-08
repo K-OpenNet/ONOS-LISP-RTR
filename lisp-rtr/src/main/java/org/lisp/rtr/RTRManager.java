@@ -39,7 +39,7 @@ public class RTRManager {
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	private Mapcache map = new Mapcache();
-	private LispChannelManage channel = new LispChannelManage();
+	private LispChannelManager channel = new LispChannelManager();
 
 	@Activate
 	protected void activate() {

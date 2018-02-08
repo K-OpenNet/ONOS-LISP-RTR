@@ -39,7 +39,7 @@ import io.netty.handler.logging.LoggingHandler;
 
 import java.net.InetSocketAddress;
 
-public class LispChannelManage {
+public class LispChannelManager {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
@@ -71,9 +71,8 @@ public class LispChannelManage {
 				protected void initChannel(NioDatagramChannel socket) throws Exception {
 					log.info("good");
 					ChannelPipeline pipe = socket.pipeline();
-					pipe.addLast("lisp_control_decoder", new LispControlPacketDecoder());
-					pipe.addLast("lisp_data_handler", new LispDataPacketHandler(rtr));
-					pipe.addLast("lisp_control_handler", new LispControlPacketHandler(rtr));
+					pipe.addLast("lisp_packet_decoder", new LispPacketDecoder());
+					pipe.addLast("lisp_channel_handler", new LispChannelHandler(rtr));
 				}	
 			});
 			control_boot.bind(new InetSocketAddress(LISP_CONTROL_PORT));

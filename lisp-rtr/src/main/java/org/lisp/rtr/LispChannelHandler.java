@@ -39,18 +39,39 @@ import java.net.InetAddress;
 
 import io.netty.channel.socket.DatagramPacket;
 
-public class LispDataPacketHandler {
+public class LispChannelHandler extends ChannelInboundHandlerAdapter {
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	private RTRManager rtr;
+	private LispControlPacketHandler ctrl;
+	private LispDataPacketHandler data;
 
-	public LispDataPacketHandler(RTRManager rtr) {
-		log.info("LISP data packet handler create");
+	public LispChannelHandler(RTRManager rtr) {
+		log.info("LISP channel handler");
 		this.rtr = rtr;	
+		this.ctrl = new LispControlPacketHandler(rtr);
+		this.data = new LispDataPacketHandler(rtr);
 	}
 
-	public DatagramPacket processPkt(LispMessage msg) {
-		return null;
+	@Override
+	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+		DatagramPacket result;
+
+		if ( ((LispMessage)msg).getType() == null ) {
+			// Data packet
+			result = data.processPkt((LispMessage)msg);
+		}
+		else {
+			// Control packet
+			result = ctrl.processPkt((LispMessage)msg);
+		}
+		
+		ctx.writeAndFlush(result);
+	}
+
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+	
 	}
 }	
 

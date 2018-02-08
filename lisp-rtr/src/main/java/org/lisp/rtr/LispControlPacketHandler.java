@@ -53,7 +53,7 @@ import org.onosproject.lisp.msg.protocols.LispMessageReader;
 import org.onosproject.lisp.msg.protocols.LispMessageReaderFactory;
 
 
-public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
+public class LispControlPacketHandler {
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	private RTRManager rtr;
@@ -65,9 +65,9 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 		this.rtr = rtr;	
 	}
 
-	@Override
-	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+	public DatagramPacket processPkt(LispMessage msg) {
 		log.info("LISP incoming msg");		
+		DatagramPacket result = null;
 
 		// Only process ECM-mapregister
 		if ( msg instanceof LispEncapsulatedControl ) {
@@ -121,9 +121,15 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 
 					        LispMapRegister authRegister = registerBuilder.build();
 						InetAddress msaddr = (IpAddress.valueOf(innerv4.getDestinationAddress())).toInetAddress();
-						ByteBuf byteBuf = Unpooled.buffer();
-						authRegister.writeTo(byteBuf);
-						ctx.writeAndFlush(new DatagramPacket(byteBuf, new InetSocketAddress(msaddr, 4342)));
+
+						try {
+							ByteBuf byteBuf = Unpooled.buffer();
+							authRegister.writeTo(byteBuf);
+							result = new DatagramPacket(byteBuf, new InetSocketAddress(msaddr, 4342));
+	//						ctx.writeAndFlush(new DatagramPacket(byteBuf, new InetSocketAddress(msaddr, 4342)));
+						}
+						catch ( Exception e ) {
+						}
 					}
 				}
 			}
@@ -153,36 +159,38 @@ public class LispControlPacketHandler extends ChannelInboundHandlerAdapter {
 				}			
 			}
 			else {
+				IPv4 iph = (IPv4)map.iph;
+				int t = iph.getSourceAddress();
+				iph.setSourceAddress(iph.getDestinationAddress());
+				iph.setDestinationAddress(t);
+				DefaultEcmBuilder builder = new DefaultEcmBuilder();
+				log.info(iph.toString());
+				log.info(noti.toString());
+					iph.resetChecksum();
+				map.udh.resetChecksum();
+				DefaultLispEncapsulatedControl enoti = (DefaultLispEncapsulatedControl)(builder.isSecurity(false)
+									.innerIpHeader(iph)
+									.innerUdpHeader(map.udh)
+									.innerLispMessage(noti)
+									.build());
 
-			IPv4 iph = (IPv4)map.iph;
-			int t = iph.getSourceAddress();
-			iph.setSourceAddress(iph.getDestinationAddress());
-			iph.setDestinationAddress(t);
-			DefaultEcmBuilder builder = new DefaultEcmBuilder();
-			log.info(iph.toString());
-			log.info(noti.toString());
-			iph.resetChecksum();
-			map.udh.resetChecksum();
-			DefaultLispEncapsulatedControl enoti = (DefaultLispEncapsulatedControl)(builder.isSecurity(false)
-								.innerIpHeader(iph)
-								.innerUdpHeader(map.udh)
-								.innerLispMessage(noti)
-								.build());
-
-			log.info(enoti.toString());
-			ByteBuf byteBuf = Unpooled.buffer();
-			enoti.writeTo(byteBuf);
+				log.info(enoti.toString());
+				try {
+					ByteBuf byteBuf = Unpooled.buffer();
+					enoti.writeTo(byteBuf);
+					result = new DatagramPacket(byteBuf, new InetSocketAddress(map.sxTR_public_RLOC.getAddress(), 4342), new InetSocketAddress("192.168.36.137", 4341));
+				}	
+				catch ( Exception e ) {
+	
+				}
 			
-			ctx.writeAndFlush(new DatagramPacket(byteBuf, new InetSocketAddress(map.sxTR_public_RLOC.getAddress(), 4342), new InetSocketAddress("192.168.36.137", 4341)));
+//				ctx.writeAndFlush(new DatagramPacket(byteBuf, new InetSocketAddress(map.sxTR_public_RLOC.getAddress(), 4342), new InetSocketAddress("192.168.36.137", 4341)));
 			}
 		}
 		else {
 			log.info("Not supported");
-		}
-	}
+		}	
 
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-	
+		return result;
 	}
 }	
