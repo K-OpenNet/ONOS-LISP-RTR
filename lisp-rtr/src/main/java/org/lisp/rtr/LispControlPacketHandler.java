@@ -167,9 +167,9 @@ public class LispControlPacketHandler {
 				log.info("forwarding?");
 				LispDataPacket dpkt = (LispDataPacket)msg;
 				IP iph = dpkt.getIP();
-				if ( iph.getVersion() == 4 ) {
 					IpAddress dip = IpAddress.valueOf(((IPv4)iph).getDestinationAddress());
 					InetAddress dnetip = dip.toInetAddress();
+					log.info(dip.toString());
 
 					MapcacheEntry map = rtr.getMapcacheMapping(dnetip);
 				
@@ -182,7 +182,6 @@ public class LispControlPacketHandler {
 						log.info("forwarded");
 						list.add(new DatagramPacket(dpkt.getContent(), map.sxTR_public_RLOC));
 					}
-				}
 			}
 		}
 		else if ( msg instanceof LispMapNotify ) {
