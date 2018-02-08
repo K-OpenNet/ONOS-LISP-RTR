@@ -27,6 +27,8 @@ import org.onosproject.lisp.msg.protocols.LispMessage;
 import org.onosproject.lisp.msg.protocols.LispMessageReader;
 import org.onosproject.lisp.msg.protocols.LispMessageReaderFactory;
 
+import java.net.InetSocketAddress;
+
 import java.util.List;
 
 public class LispPacketDecoder extends MessageToMessageDecoder<DatagramPacket> {
@@ -49,7 +51,7 @@ public class LispPacketDecoder extends MessageToMessageDecoder<DatagramPacket> {
         	list.add(message);
     	}
 	else {
-		// Data packetA
+		// Data packet
 		log.info("data 1");
 		ByteBuf content = msg.content().copy();
 		LispDataPacket.DataPacketReader reader = new LispDataPacket.DataPacketReader();
@@ -57,6 +59,9 @@ public class LispPacketDecoder extends MessageToMessageDecoder<DatagramPacket> {
 		LispMessage message = reader.readFrom(msg.content(), content);
 		log.info("data 3");
 		list.add(message);
+
+		ctx.writeAndFlush(new DatagramPacket(((LispDataPacket)message).getContent(),
+			new InetSocketAddress("192.168.36.133", 4342)));
 	}
    }
 }

@@ -62,11 +62,16 @@ public final class LispDataPacket implements LispMessage {
 
 	@Override
 	public void writeTo(ByteBuf byteBuf) throws LispWriterException {
+		
 	}
 
 	@Override
 	public Builder createBuilder() {
 		return null;
+	}
+
+	public ByteBuf getContent() {
+		return this.content;
 	}
 
 	public static final class DataPacketBuilder implements Builder {
