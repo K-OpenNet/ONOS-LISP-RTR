@@ -76,7 +76,7 @@ public class LispDataPacketHandler {
 
 			if ( !rtr.isValidPacket(dnetip) )
 				return null;
-			
+
 			if ( map == null )	
 			{
 				// Need to send map-request 

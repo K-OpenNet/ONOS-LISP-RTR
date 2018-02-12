@@ -149,7 +149,6 @@ public class LispControlPacketHandler {
 	
 			// Try to send buffered packet
 			ArrayList<LispDataPacket> pkts = rtr.getPacket();
-			log.info(Integer.toString(pkts.size()));
 			for ( LispDataPacket pkt : pkts ) {
 				IP iph = pkt.getIP();
 				IpAddress dip = IpAddress.valueOf(((IPv4)iph).getDestinationAddress());
@@ -199,7 +198,6 @@ public class LispControlPacketHandler {
 									.innerLispMessage(noti)
 									.build());
 
-				log.info(enoti.toString());
 				try {
 					ByteBuf byteBuf = Unpooled.buffer();
 					enoti.writeTo(byteBuf);

@@ -55,6 +55,13 @@ public class RTRManager {
 		channel.initialize(this);
 		whiteList = new ArrayList<String>();
 		whiteList.add("141.223.0.0");
+		whiteList.add("115.69.0.0");
+		whiteList.add("192.168.0.0");
+		whiteList.add("172.20.0.0");
+		whiteList.add("172.31.0.0");
+		whiteList.add("223.33.0.0");
+		whiteList.add("20.0.0.0");
+		whiteList.add("40.0.0.0");
 	        log.info("Started");
 	}
 
@@ -65,7 +72,6 @@ public class RTRManager {
 
 	public void addMapcacheMapping(MapcacheEntry entry) {
 		map.addMapping(entry);
-		log.info(Integer.toString(map.getSize()));
 	}
 
 	public MapcacheEntry getMapcacheMapping(long nonce) {

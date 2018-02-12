@@ -69,7 +69,7 @@ public class LispChannelManager {
 			.handler(new ChannelInitializer<NioDatagramChannel>() {
 				@Override
 				protected void initChannel(NioDatagramChannel socket) throws Exception {
-					log.info("good");
+					log.info("channel initialize");
 					ChannelPipeline pipe = socket.pipeline();
 					pipe.addLast("lisp_packet_decoder", new LispPacketDecoder());
 					pipe.addLast("lisp_channel_handler", new LispChannelHandler(rtr));
