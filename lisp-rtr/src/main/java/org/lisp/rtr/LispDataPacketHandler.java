@@ -53,9 +53,14 @@ public class LispDataPacketHandler {
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	private RTRManager rtr;
 
+	private String rtrAddr;
+	private String msAddr;
+
 	public LispDataPacketHandler(RTRManager rtr) {
 		log.info("LISP data packet handler create");
-		this.rtr = rtr;	
+		this.rtr = rtr;
+		this.rtrAddr = rtr.getRTRAddr();	
+		this.msAddr = rtr.getMSAddr();
 	}
 
 	public ArrayList<DatagramPacket> processPkt(LispMessage msg) {
@@ -68,18 +73,14 @@ public class LispDataPacketHandler {
 			IpAddress dip = IpAddress.valueOf(((IPv4)iph).getDestinationAddress());
 			InetAddress dnetip = dip.toInetAddress();
 			MapcacheEntry map = rtr.getMapcacheMapping(dnetip);
-			log.info(snetip.toString());
-			log.info(dnetip.toString());
 			
 			if ( map == null )	
 			{
 				// Need to send map-request 
-				log.info("1");
 				ArrayList<LispAfiAddress> itr = new ArrayList<LispAfiAddress>();
-				itr.add(new LispIpv4Address(IpAddress.valueOf("192.168.36.137")));
+				itr.add(new LispIpv4Address(IpAddress.valueOf(rtrAddr)));
 				ArrayList<LispEidRecord> eidrec = new ArrayList<LispEidRecord>();
 				eidrec.add(new LispEidRecord((byte) 32, new LispIpv4Address(dip)));
-				log.info("2");
         			LispMapRequest req = new DefaultRequestBuilder()
 							.withIsAuthoritative(true)
 							.withIsMapDataPresent(true)
@@ -93,31 +94,30 @@ public class LispDataPacketHandler {
 							.withNonce(new Random().nextLong())
 							.withReplyRecord(1)
 							.build();
-				log.info("3");
+
 				// Encapsulated
 				IPv4 eiph = new IPv4();
-				log.info("3.1");
-				Ip4Address addr = Ip4Address.valueOf("192.168.36.137");
+				Ip4Address addr = Ip4Address.valueOf(rtrAddr);
 				eiph.setSourceAddress(addr.toInt());
-				addr = Ip4Address.valueOf("192.168.36.133");
+				addr = Ip4Address.valueOf(msAddr);
 				eiph.setDestinationAddress(addr.toInt());
-				log.info("3.2");
+
 				UDP eudh = new UDP();
 				eudh.setSourcePort(4342);
 				eudh.setDestinationPort(4342);
-				log.info("4");
+
 				LispEncapsulatedControl ecm = new DefaultEcmBuilder()
 							.isSecurity(false)
 							.innerIpHeader(eiph)
 							.innerUdpHeader(eudh)
 							.innerLispMessage(req)
 							.build();	
+
 				ByteBuf byteBuf = Unpooled.buffer();
-				log.info("hi?");
 				try {
 					ecm.writeTo(byteBuf);
-					list.add(new DatagramPacket(byteBuf, new InetSocketAddress("192.168.36.133", 4342)));
-					log.info("ECM write");
+					list.add(new DatagramPacket(byteBuf, new InetSocketAddress(msAddr, 4342)));
+					log.info("Map-request : From : " + rtrAddr.toString() + " to : " + msAddr.toString() + " for : " + dnetip.toString());
 				}
 				catch ( Exception e ) {
 				}

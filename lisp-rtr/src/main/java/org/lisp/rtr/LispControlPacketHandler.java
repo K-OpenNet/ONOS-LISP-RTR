@@ -62,13 +62,15 @@ public class LispControlPacketHandler {
 
 	private LispAuthenticationConfig authConfig = LispAuthenticationConfig.getInstance();
 
+	private String rtrAddr;
+
 	public LispControlPacketHandler(RTRManager rtr) {
 		log.info("LISP control packet handler create");
 		this.rtr = rtr;	
+		this.rtrAddr = rtr.getRTRAddr();
 	}
 
 	public ArrayList<DatagramPacket> processPkt(LispMessage msg) {
-		log.info("LISP incoming msg");		
 		ArrayList<DatagramPacket> list = new ArrayList<DatagramPacket>();
 
 		// Only process ECM-mapregister
@@ -78,38 +80,24 @@ public class LispControlPacketHandler {
 			LispMessage innermsg = ecm.getControlMessage();
 			IP innerheader = ecm.innerIpHeader();		
 		        innermsg.configSender(ecm.getSender());
-			log.info(ecm.getSender().toString());
 
 			if ( innermsg instanceof LispMapRegister ) {
-				log.info("ECM ms-register 1");
 				LispMapRegister reg = (LispMapRegister) innermsg;
 
 				// Create mapcache
 				for ( LispMapRecord record : reg.getMapRecords() ) {
-					log.info("ECM ms-register 2");
 					LispAfiAddress addr = record.getEidPrefixAfi();
+
 						// Only support IPv4
 					if ( innerheader.getVersion() == 4 && addr.getAfi() == IP4 ) {
-						log.info("ECM ms-register 3");
 						IPv4 innerv4 = (IPv4) innerheader;
 						IpAddress ip = IpAddress.valueOf(innerv4.getSourceAddress());
 						IpAddress eid = ((LispIpv4Address)addr).getAddress();
-						log.info(eid.toString());
-						log.info(ip.toString());
-						log.info(ecm.innerIpHeader().toString());
 	
 						// MaskLeng, EID, GRLOC, PRLOC, xTR-ID, nonce, IP, UDP
 						rtr.addMapcacheMapping(new MapcacheEntry(record.getMaskLength(), eid.toInetAddress(), ecm.getSender(),
 									ip.toInetAddress(), 0, 0, reg.getNonce(),
 									ecm.innerIpHeader(), ecm.innerUdp()));
-						/*
-						// Only support one locator
-						for ( LispLocator loc : record.getLocators() ) {
-							//Global RLOC, EID lendth, EID-prefix, xTR-private-RLOC, xTR-ID
-								map.addMapping(msg.getSender(), record.getMaskLength(),
-										ip.toInetAddress(), 0, 0);
-						}
-						*/
 
 						//Re-originate map-register
 						DefaultRegisterBuilder registerBuilder = new DefaultRegisterBuilder();
@@ -127,6 +115,8 @@ public class LispControlPacketHandler {
 							ByteBuf byteBuf = Unpooled.buffer();
 							authRegister.writeTo(byteBuf);
 							list.add(new DatagramPacket(byteBuf, new InetSocketAddress(msaddr, 4342)));
+							log.info("ECM Map-register : From : " + ecm.getSender().toString() + " with inner : From : " + ip.toString()
+								+ " eid : " + eid.toString() + " to : " + msaddr.toString());
 						}
 						catch ( Exception e ) {
 						}
@@ -138,12 +128,10 @@ public class LispControlPacketHandler {
 			}			
 		}
 		else if ( msg instanceof LispMapReply ) {
-			log.info("Map-reply 1");
 			LispMapReply rep = (LispMapReply) msg;
 
 			// Create mapcache
 			for ( LispMapRecord record : rep.getMapRecords() ) {
-				log.info("Map-reply 2");	
 				LispAfiAddress addr = record.getEidPrefixAfi();
 
 				if ( addr.getAfi() == IP4 ) {
@@ -151,11 +139,10 @@ public class LispControlPacketHandler {
 					for ( LispLocator loc : record.getLocators() ) {
 						LispAfiAddress locator = loc.getLocatorAfi();
 						IpAddress iplocator = ((LispIpv4Address)locator).getAddress();
-						log.info(eid.toInetAddress().toString());
-						log.info(iplocator.toString());
 						rtr.addMapcacheMapping(new MapcacheEntry(record.getMaskLength(), eid.toInetAddress(), new InetSocketAddress(iplocator.toInetAddress(), 4341),
 							null, 0, 0, rep.getNonce(),
 							null, null));
+						log.info("Map-reply : EID : " + eid.toString() + " RLOC : " + iplocator.toString());
 					}
 				}
 			}
@@ -164,45 +151,34 @@ public class LispControlPacketHandler {
 			ArrayList<LispDataPacket> pkts = rtr.getPacket();
 			log.info(Integer.toString(pkts.size()));
 			for ( LispDataPacket pkt : pkts ) {
-				log.info("forwarding?");
-				log.info("0");
 				IP iph = pkt.getIP();
-				log.info("1");
-				log.info(Integer.toString(((IPv4)iph).getDestinationAddress()));
-				log.info("2");
-					IpAddress dip = IpAddress.valueOf(((IPv4)iph).getDestinationAddress());
-					InetAddress dnetip = dip.toInetAddress();
-					log.info(dip.toString());
+				IpAddress dip = IpAddress.valueOf(((IPv4)iph).getDestinationAddress());
+				InetAddress dnetip = dip.toInetAddress();
 
-					MapcacheEntry map = rtr.getMapcacheMapping(dnetip);
+				MapcacheEntry map = rtr.getMapcacheMapping(dnetip);
 				
-					if ( map == null ) {
-						log.info("???");
-						continue;
-					}
-					else {
-						// Forwarding
-						log.info("forwarded");
-						list.add(new DatagramPacket(pkt.getContent(), map.sxTR_public_RLOC));
-					}
+				if ( map == null ) {
+					continue;
+				}
+				else {
+					// Forwarding
+					list.add(new DatagramPacket(pkt.getContent(), map.sxTR_public_RLOC));
+					log.info("Try to send a packet to : " + map.sxTR_public_RLOC.toString());
+				}
 			}
 		}
 		else if ( msg instanceof LispMapNotify ) {
-			log.info("Map-notify");
 			LispMapNotify noti = (LispMapNotify)msg;
 			MapcacheEntry map = rtr.getMapcacheMapping(noti.getNonce());
 
 			if ( map == null ) {
 				// This map-request for own cache
-				log.info("Map-notify for this RTR");
 				for ( LispMapRecord record : noti.getMapRecords() ) {
 					LispAfiAddress addr = record.getEidPrefixAfi();
 					IpAddress eid = ((LispIpv4Address)addr).getAddress();
 					for ( LispLocator loc : record.getLocators() ) {
 						LispAfiAddress locator = loc.getLocatorAfi();
 						IpAddress iplocator = ((LispIpv4Address)locator).getAddress();
-						log.info(eid.toInetAddress().toString());
-						log.info(iplocator.toInetAddress().toString());
 						MapcacheEntry lmap = new MapcacheEntry(record.getMaskLength(), eid.toInetAddress(), new InetSocketAddress(iplocator.toInetAddress(), 4341), null,
 							0, 0, noti.getNonce(), null, null);
 					}
@@ -214,10 +190,9 @@ public class LispControlPacketHandler {
 				iph.setSourceAddress(iph.getDestinationAddress());
 				iph.setDestinationAddress(t);
 				DefaultEcmBuilder builder = new DefaultEcmBuilder();
-				log.info(iph.toString());
-				log.info(noti.toString());
-					iph.resetChecksum();
+				iph.resetChecksum();
 				map.udh.resetChecksum();
+
 				DefaultLispEncapsulatedControl enoti = (DefaultLispEncapsulatedControl)(builder.isSecurity(false)
 									.innerIpHeader(iph)
 									.innerUdpHeader(map.udh)
@@ -228,13 +203,11 @@ public class LispControlPacketHandler {
 				try {
 					ByteBuf byteBuf = Unpooled.buffer();
 					enoti.writeTo(byteBuf);
-					list.add(new DatagramPacket(byteBuf, new InetSocketAddress(map.sxTR_public_RLOC.getAddress(), 4342), new InetSocketAddress("192.168.36.137", 4341)));
+					list.add(new DatagramPacket(byteBuf, new InetSocketAddress(map.sxTR_public_RLOC.getAddress(), 4342), new InetSocketAddress(rtrAddr, 4341)));
+					log.info("ECM Map-notify : From : " + rtrAddr + " to : " + map.sxTR_public_RLOC.getAddress().toString());
 				}	
 				catch ( Exception e ) {
-	
 				}
-			
-//				ctx.writeAndFlush(new DatagramPacket(byteBuf, new InetSocketAddress(map.sxTR_public_RLOC.getAddress(), 4342), new InetSocketAddress("192.168.36.137", 4341)));
 			}
 		}
 		else {

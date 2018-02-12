@@ -44,6 +44,9 @@ public class RTRManager {
 	private LispChannelManager channel = new LispChannelManager();
 	private ArrayList<LispDataPacket> pktBuf = new ArrayList<LispDataPacket>();
 
+	private final String rtrAddr = "13.58.128.5";
+	private final String ms = "18.218.233.30";
+
 	@Activate
 	protected void activate() {
 		map.initialize();
@@ -76,5 +79,13 @@ public class RTRManager {
 
 	public ArrayList<LispDataPacket> getPacket() {
 		return pktBuf;
+	}
+
+	public String getRTRAddr() {
+		return this.rtrAddr;
+	}
+		
+	public String getMSAddr() {
+		return this.ms;	
 	}
 }
