@@ -43,6 +43,8 @@ public class Mapcache {
 
 		if ( (t = isContain(entry)) != null )
 			updateMapping(entry, t);
+		else
+			mapDb.add(entry);
 	}
 
 	public void addMapping(InetSocketAddress grloc, byte len, InetAddress prefix, InetAddress rloc, long id1, long id2, long nonce, IP iph, UDP udh) {
@@ -52,6 +54,8 @@ public class Mapcache {
 	
 		if ( (t = isContain(entry)) != null )
 			updateMapping(entry, t);
+		else
+			mapDb.add(entry);
 	}
 
 	public void deleteMapping(InetSocketAddress key) {
