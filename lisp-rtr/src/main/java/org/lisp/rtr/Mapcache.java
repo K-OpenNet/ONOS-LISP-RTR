@@ -64,8 +64,6 @@ public class Mapcache {
 
 	// xTR <-> RTR for data packets forwarding
 	public MapcacheEntry getMapping(InetAddress eid) {
-		log.info("map cache");
-		log.info(eid.toString());
 		byte[] eidaddr = eid.getAddress();
 
 		for ( MapcacheEntry entry : mapDb ) {

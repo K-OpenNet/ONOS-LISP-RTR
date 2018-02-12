@@ -44,6 +44,8 @@ public class RTRManager {
 	private LispChannelManager channel = new LispChannelManager();
 	private ArrayList<LispDataPacket> pktBuf = new ArrayList<LispDataPacket>();
 
+	private ArrayList<String> whiteList;
+
 	private final String rtrAddr = "13.58.128.5";
 	private final String ms = "18.218.233.30";
 
@@ -51,6 +53,8 @@ public class RTRManager {
 	protected void activate() {
 		map.initialize();
 		channel.initialize(this);
+		whiteList = new ArrayList<String>();
+		whiteList.add("141.223.0.0");
 	        log.info("Started");
 	}
 
@@ -79,6 +83,45 @@ public class RTRManager {
 
 	public ArrayList<LispDataPacket> getPacket() {
 		return pktBuf;
+	}
+
+	public boolean isValidPacket(InetAddress address) {
+		byte[] eidaddr = address.getAddress();
+
+		for ( String entry : whiteList ) {
+			// Address comparing using subnet mask
+			byte t1 = (byte)(2);
+			byte t2 = (byte)(0);
+			byte[] addr;
+			
+			try { 
+				addr = InetAddress.getByName(entry).getAddress();
+			}
+			catch ( Exception e ) {
+				addr = null;
+				return false;
+			}
+
+			boolean pass = true;
+			for ( byte t = 0 ; t < t1 ; t++ ) {
+				if ( addr[t] != eidaddr[t] ) {
+					pass = false;
+					break;
+				}
+			}
+
+			if ( pass && t2 != 0 ) {
+				byte t3 = (byte)(255 << ( 8 - t2));
+				if ( (addr[t1] & t3) != (eidaddr[t1] & t3) ) {
+					pass = false;
+					continue;
+				}
+			}
+
+			if ( pass )
+				return true;
+		}
+		return false;
 	}
 
 	public String getRTRAddr() {

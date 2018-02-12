@@ -37,13 +37,8 @@ public class LispPacketDecoder extends MessageToMessageDecoder<DatagramPacket> {
 	
 	@Override
 	protected void decode(ChannelHandlerContext ctx, DatagramPacket msg, List<Object> list) throws Exception {
-
-
-	log.info("decode 1");
-	log.info(Integer.toString(msg.recipient().getPort()));
 	if ( msg.recipient().getPort() == 4342 ) {
 		// Control packet
-		log.info("control 1");
 	        ByteBuf byteBuf = msg.content();
 	        LispMessageReader reader = LispMessageReaderFactory.getReader(byteBuf);
         	LispMessage message = (LispMessage) reader.readFrom(byteBuf);
@@ -52,7 +47,6 @@ public class LispPacketDecoder extends MessageToMessageDecoder<DatagramPacket> {
     	}
 	else {
 		// Data packet
-		log.info("data 1");
 		ByteBuf content = msg.content().copy();
 		LispDataPacket.DataPacketReader reader = new LispDataPacket.DataPacketReader();
 		LispMessage message = reader.readFrom(msg.content(), content);

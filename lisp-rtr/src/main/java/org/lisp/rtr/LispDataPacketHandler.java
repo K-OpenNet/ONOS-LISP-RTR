@@ -73,6 +73,9 @@ public class LispDataPacketHandler {
 			IpAddress dip = IpAddress.valueOf(((IPv4)iph).getDestinationAddress());
 			InetAddress dnetip = dip.toInetAddress();
 			MapcacheEntry map = rtr.getMapcacheMapping(dnetip);
+
+			if ( !rtr.isValidPacket(dnetip) )
+				return null;
 			
 			if ( map == null )	
 			{
