@@ -81,7 +81,7 @@ public class RTRManager {
 		Properties properties = new Properties();
 		try {
 			// Read XML file
-			properties.loadFromXML(new FileInputStream("config.xml"));
+			properties.loadFromXML(getClass().getResourceAsStream("config.xml"));
 
 			// MS RLOC
 			ms = (String)properties.get("map-server");	
@@ -103,7 +103,7 @@ public class RTRManager {
 			}
 		}
 		catch ( Exception e ) {
-			
+			log.info(e.toString());
 		}
 	}
 
