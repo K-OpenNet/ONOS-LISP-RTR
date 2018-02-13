@@ -32,8 +32,12 @@ import org.onosproject.lisp.msg.protocols.LispMessage;
 
 import java.net.InetSocketAddress;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.InterfaceAddress;
 
 import java.util.ArrayList;
+import java.util.Properties;
+import java.io.FileInputStream;
 
 @Component(immediate = true)
 public class RTRManager {
@@ -46,13 +50,14 @@ public class RTRManager {
 
 	private ArrayList<String> whiteList;
 
-	private final String rtrAddr = "13.58.128.5";
-	private final String ms = "18.218.233.30";
+	private String rtrAddr;
+	private String ms;
 
 	@Activate
 	protected void activate() {
 		map.initialize();
 		channel.initialize(this);
+		/*
 		whiteList = new ArrayList<String>();
 		whiteList.add("141.223.0.0");
 		whiteList.add("115.69.0.0");
@@ -62,12 +67,44 @@ public class RTRManager {
 		whiteList.add("223.33.0.0");
 		whiteList.add("20.0.0.0");
 		whiteList.add("40.0.0.0");
+		*/
+		initialize();
 	        log.info("Started");
 	}
 
 	@Deactivate
 	protected void deactivate() {
 	        log.info("Stopped");
+	}
+
+	private void initialize() {
+		Properties properties = new Properties();
+		try {
+			// Read XML file
+			properties.loadFromXML(new FileInputStream("config.xml"));
+
+			// MS RLOC
+			ms = (String)properties.get("map-server");	
+			
+			// Control Interface RLOC
+			String inter = (String)properties.get("control-interface");
+			NetworkInterface interf = NetworkInterface.getByName(inter);
+			for ( InterfaceAddress addr : interf.getInterfaceAddresses() ) {
+				rtrAddr = addr.getAddress().toString();
+			}
+		
+			log.info("Initialized : ms : " + ms + " interface : " + inter + " : ControlRLOC : " + rtrAddr);
+			// White list
+			String wl = (String)properties.get("white-list");
+			whiteList = new ArrayList<String>();
+			for ( String t : wl.split(",") ) {
+				whiteList.add(t);
+				log.info(t);
+			}
+		}
+		catch ( Exception e ) {
+			
+		}
 	}
 
 	public void addMapcacheMapping(MapcacheEntry entry) {
