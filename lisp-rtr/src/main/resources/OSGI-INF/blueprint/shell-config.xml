@@ -25,6 +25,9 @@
         <command>
             <action class="org.lisp.rtr.cli.LispGetMappingCommand"/>
         </command>
+        <command>
+            <action class="org.lisp.rtr.cli.LispPrintMapcache"/>
+        </command>
     </command-bundle>
 
 </blueprint>

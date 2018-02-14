@@ -40,7 +40,7 @@ import java.util.Properties;
 import java.io.FileInputStream;
 
 @Component(immediate = true)
-public class RTRManager {
+public class RTRManager implements RTRService {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -75,6 +75,27 @@ public class RTRManager {
 	@Deactivate
 	protected void deactivate() {
 	        log.info("Stopped");
+	}
+
+	@Override
+	public String printMapcache() {
+		String t = "Hello";
+		return t;
+	}
+
+	@Override
+	public void printWhiteList() {
+
+	}
+
+	@Override
+	public void addMapcache() {
+
+	}
+
+	@Override
+	public void addWhiteList() {
+
 	}
 
 	private void initialize() {
