@@ -17,16 +17,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
         <command>
-            <action class="org.lisp.rtr.cli.AppCommand"/>
-        </command>
-         <command>
-            <action class="org.lisp.rtr.cli.LispGetHostCommand"/>
-        </command>
-        <command>
-            <action class="org.lisp.rtr.cli.LispGetMappingCommand"/>
-        </command>
-        <command>
-            <action class="org.lisp.rtr.cli.LispPrintMapcache"/>
+            <action class="org.lisp.rtr.AppCommand"/>
         </command>
     </command-bundle>
 
